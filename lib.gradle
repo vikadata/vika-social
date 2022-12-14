@@ -1,0 +1,22 @@
+ext {
+  dependencies = [
+    'spring-web-starter'          : 'org.springframework.boot:spring-boot-starter-web',
+    'spring-web'                  : 'org.springframework:spring-web',
+    'spring-data-redis'           : 'org.springframework.data:spring-data-redis',
+    'lombok'                      : 'org.projectlombok:lombok',
+    'jackson'                     : 'com.fasterxml.jackson.core:jackson-databind',
+    'servlet-api'                 : 'javax.servlet:javax.servlet-api',
+    'wx-cp'                       : "com.github.binarywang:weixin-java-cp:4.2.0",
+    'slf4j'                       : [
+      'org.slf4j:slf4j-api',
+      'ch.qos.logback:logback-classic',
+    ],
+    'hutool'                      : [
+      "cn.hutool:hutool-core:5.5.9",
+      "cn.hutool:hutool-json:5.5.9",
+      "cn.hutool:hutool-crypto:5.5.9",
+      "cn.hutool:hutool-cache:5.5.9",
+      "cn.hutool:hutool-http:5.5.9",
+    ],
+  ]
+}

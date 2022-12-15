@@ -56,9 +56,12 @@ publishing {
     }
     repositories {
         maven {
-            def releasesRepoUrl = layout.buildDirectory.dir('https://oss.sonatype.org/service/local/staging/deploy/maven2/')
-            def snapshotsRepoUrl = layout.buildDirectory.dir('https://oss.sonatype.org/content/repositories/snapshots/')
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            name = "OSSRH"
+            if (project.version.toString().endsWith("-SNAPSHOT")) {
+                url = "https://oss.sonatype.org/content/repositories/snapshots"
+            } else {
+                url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            }
             credentials {
                 username = System.getenv("MAVEN_USERNAME")
                 password = System.getenv("MAVEN_PASSWORD")

@@ -5,7 +5,6 @@
 [![MIT](https://img.shields.io/badge/licenses-MIT-blue)](https://vikadata.mit-license.org/)
 [![Maven Central](https://img.shields.io/maven-central/v/cn.vika/vika-social.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22cn.vika%22%20AND%20a:%22vika-social%22)
 
----
 ## Usage
 
 ### Java Version Requirement

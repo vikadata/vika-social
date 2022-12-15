@@ -1,4 +1,4 @@
-# Vika Social SDK (vika-social)<br/>Specially used for domestic [vika SaaS](https://vika.cn) application
+# Vika Social SDK (vika-social)<br/>Specially used for domestic [_vika SaaS_](https://vika.cn) application
 
 ![action](https://github.com/vikadata/vika-social/actions/workflows/test.yml/badge.svg)
 ![action](https://github.com/vikadata/vika-social/actions/workflows/build.yml/badge.svg)

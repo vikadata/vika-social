@@ -1,2 +1,2 @@
-# vikadata-social
-FeiShu/DingTalk SDK
+# vika-social
+

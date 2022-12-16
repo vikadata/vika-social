@@ -43,7 +43,6 @@ Just need to import the correspond packages to use.
 Create register and delete call back url methods.
 
 ```java
-// Import class
 import com.vikadata.social.dingtalk.DingTalkTemplate;
 
 @Autowired

@@ -16,16 +16,10 @@ jobs:
           distribution: 'adopt'
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@v1
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Build with Gradle
-        run: ./gradlew build
-      - name: Decode
-        run: |
-          echo "${{secrets.SIGNING_SECRET_KEY_RING_FILE}}" > ~/.gradle/secret.gpg.base64
-          base64 -d ~/.gradle/secret.gpg.base64 > ~/.gradle/secret.gpg
       - name: Publish package
-        run: gradle publish  -Psigning.keyId=${{secrets.SIGNING_KEY_ID}} -Psigning.password=${{secrets.SIGNING_KEY_PASSWORD}} -Psigning.secretKeyRingFile=$(echo ~/.gradle/secret.gpg)
+        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+        with:
+          arguments: publish
         env:
           MAVEN_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}

@@ -71,7 +71,6 @@ signing {
     sign publishing.publications.mavenJava
 }
 
-
 javadoc {
     if(JavaVersion.current().isJava9Compatible()) {
         options.addBooleanOption('html5', true)
@@ -80,7 +79,7 @@ javadoc {
 
 allprojects {
     group = 'cn.vika'
-    version = '0.0.1-SNAPSHOT'
+    version = '0.0.3-SNAPSHOT'
     repositories {
         mavenCentral()
     }

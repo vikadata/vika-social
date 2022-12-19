@@ -9,6 +9,9 @@ plugins {
 
 apply from: 'lib.gradle'
 
+group = 'cn.vika'
+version = '1.0.1-SNAPSHOT'
+
 java {
     withJavadocJar()
     withSourcesJar()
@@ -79,8 +82,6 @@ javadoc {
 }
 
 allprojects {
-    group = 'cn.vika'
-    version = '1.0.1-SNAPSHOT'
     repositories {
         mavenCentral()
     }

@@ -95,10 +95,6 @@ subprojects {
             mavenBom("org.springframework.boot:spring-boot-dependencies:2.7.6")
         }
     }
-    java {
-        withJavadocJar()
-        withSourcesJar()
-    }
 }
 
 bootJar {

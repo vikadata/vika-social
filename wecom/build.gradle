@@ -19,6 +19,11 @@ dependencies {
 group = 'cn.vika'
 version = '1.0.1'
 
+java {
+  withJavadocJar()
+  withSourcesJar()
+}
+
 publishing {
   publications {
     mavenJava(MavenPublication) {
@@ -34,6 +39,7 @@ publishing {
       }
       pom {
         name = 'Vika WeCom Sdk'
+        description = 'Vika WeCom Sdk'
         url = 'https://github.com/vikadata/vika-social'
         licenses {
           license {

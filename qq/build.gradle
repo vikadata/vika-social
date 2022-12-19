@@ -14,6 +14,11 @@ dependencies {
 group = 'cn.vika'
 version = '1.0.1'
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -29,6 +34,7 @@ publishing {
             }
             pom {
                 name = 'Vika QQ Sdk'
+                description = 'Vika QQ Sdk'
                 url = 'https://github.com/vikadata/vika-social'
                 licenses {
                     license {

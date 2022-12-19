@@ -18,6 +18,11 @@ dependencies {
 group = 'cn.vika'
 version = '1.0.1'
 
+java {
+  withJavadocJar()
+  withSourcesJar()
+}
+
 publishing {
   publications {
     mavenJava(MavenPublication) {
@@ -33,6 +38,7 @@ publishing {
       }
       pom {
         name = 'Vika DingTalk Sdk'
+        description = 'Vika DingTalk Sdk'
         url = 'https://github.com/vikadata/vika-social'
         licenses {
           license {

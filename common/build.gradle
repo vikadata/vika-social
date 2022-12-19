@@ -13,11 +13,6 @@ dependencies {
 group = 'cn.vika'
 version = '1.0.1'
 
-java {
-  withJavadocJar()
-  withSourcesJar()
-}
-
 publishing {
   publications {
     mavenJava(MavenPublication) {

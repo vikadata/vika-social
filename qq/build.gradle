@@ -11,9 +11,6 @@ dependencies {
   implementation rootProject.ext.dependencies['slf4j']
 }
 
-group = 'cn.vika'
-version = '0.0.5-SNAPSHOT'
-
 publishing {
     publications {
         mavenJava(MavenPublication) {

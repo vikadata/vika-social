@@ -15,9 +15,6 @@ dependencies {
   compileOnly rootProject.ext.dependencies['lombok']
 }
 
-group = 'cn.vika'
-version = '0.0.5-SNAPSHOT'
-
 publishing {
   publications {
     mavenJava(MavenPublication) {

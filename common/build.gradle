@@ -10,9 +10,6 @@ dependencies {
   implementation(rootProject.ext.dependencies['servlet-api'])
 }
 
-group = 'cn.vika'
-version = '0.0.5-SNAPSHOT'
-
 publishing {
   publications {
     mavenJava(MavenPublication) {

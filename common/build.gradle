@@ -1,9 +1,70 @@
 plugins {
   id 'java-library'
+  id 'maven-publish'
+  id 'signing'
 }
 
 dependencies {
   api(rootProject.ext.dependencies['spring-web'])
   api(rootProject.ext.dependencies['spring-data-redis'])
   implementation(rootProject.ext.dependencies['servlet-api'])
+}
+
+group = 'cn.vika'
+version = '0.0.5-SNAPSHOT'
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      artifactId = 'vika-social-common'
+      from components.java
+      versionMapping {
+        usage('java-api') {
+          fromResolutionOf('runtimeClasspath')
+        }
+        usage('java-runtime') {
+          fromResolutionResult()
+        }
+      }
+      pom {
+        name = 'Vika Common Sdk'
+        url = 'https://github.com/vikadata/vika-social'
+        licenses {
+          license {
+            name = 'MIT License'
+            url = 'https://vikadata.mit-license.org'
+          }
+        }
+        developers {
+          developer {
+            name = 'Bron'
+            email = 'liuzijing@vikadata.com'
+          }
+        }
+        scm {
+          connection = 'scm:git:git@github.com:vikadata/vika-social.git'
+          developerConnection = 'scm:git:git@github.com:vikadata/vika-social.git'
+          url = 'https://github.com/vikadata/vika-social'
+        }
+      }
+    }
+  }
+  repositories {
+    maven {
+      name = "OSSRH"
+      if (project.version.toString().endsWith("-SNAPSHOT")) {
+        url = "https://oss.sonatype.org/content/repositories/snapshots"
+      } else {
+        url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+      }
+      credentials {
+        username = System.getenv("MAVEN_USERNAME")
+        password = System.getenv("MAVEN_PASSWORD")
+      }
+    }
+  }
+}
+
+signing {
+  sign publishing.publications.mavenJava
 }

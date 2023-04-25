@@ -5,7 +5,7 @@ import static com.vikadata.social.dingtalk.exception.DingTalkExceptionConstants.
 import static com.vikadata.social.dingtalk.exception.DingTalkExceptionConstants.INVALID_SUITE_TICKET;
 import static com.vikadata.social.dingtalk.exception.DingTalkExceptionConstants.ISV_API_MAX_LIMIT_MINUTES;
 import static com.vikadata.social.dingtalk.exception.DingTalkExceptionConstants.ISV_API_MAX_LIMIT_SECONDS;
-
+import static com.vikadata.social.dingtalk.exception.DingTalkExceptionConstants.ISV_API_QPS_LIMIT;
 /**
  * api exception
  *
@@ -41,6 +41,7 @@ public class DingTalkApiException extends RuntimeException {
     }
 
     public Boolean isLimitError() {
-        return ISV_API_MAX_LIMIT_MINUTES == code || ISV_API_MAX_LIMIT_SECONDS == code;
+        return ISV_API_MAX_LIMIT_MINUTES == code || ISV_API_MAX_LIMIT_SECONDS == code
+            || ISV_API_QPS_LIMIT == code;
     }
 }

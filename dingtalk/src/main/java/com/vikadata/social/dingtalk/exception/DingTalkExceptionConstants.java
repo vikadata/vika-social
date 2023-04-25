@@ -65,4 +65,9 @@ public class DingTalkExceptionConstants {
      */
     public static final int SUB_CODE_REQUEST_ERROR = 88;
 
+    /**
+     * API frequency limit Each application, for each authorized enterprise, call each interface, the maximum frequency is 20 times per second
+     */
+    public static final int ISV_API_QPS_LIMIT = 90018;
+
 }

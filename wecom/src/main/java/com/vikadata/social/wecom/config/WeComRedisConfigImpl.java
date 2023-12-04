@@ -9,7 +9,7 @@ import me.chanjar.weixin.common.redis.WxRedisOps;
 import me.chanjar.weixin.cp.config.impl.WxCpDefaultConfigImpl;
 
 /**
- * Wecom configuration file Redis storage strategy implementation <br/>
+ * Wecom configuration file Redis storage strategy implementation
  * Inherited from WxJava Enterprise WeChat Implementation
  */
 public class WeComRedisConfigImpl extends WxCpDefaultConfigImpl {
@@ -20,7 +20,8 @@ public class WeComRedisConfigImpl extends WxCpDefaultConfigImpl {
 
     protected final static String WORK_WEIXIN_JSAPI_TICKET_KEY = "work_weixin:jsapi_ticket_key:";
 
-    protected final static String WORK_WEIXIN_AGENT_JSAPI_TICKET_KEY = "work_weixin:agent_jsapi_ticket_key:";
+    protected final static String WORK_WEIXIN_AGENT_JSAPI_TICKET_KEY =
+        "work_weixin:agent_jsapi_ticket_key:";
 
     /**
      * The prefix of the key stored by redis, which can be null
@@ -44,6 +45,9 @@ public class WeComRedisConfigImpl extends WxCpDefaultConfigImpl {
 
     /**
      * get lock
+     *
+     * @param key key
+     * @return Lock instance
      */
     protected Lock getLockByKey(String key) {
         return redisOps.getLock(key);
@@ -93,7 +97,8 @@ public class WeComRedisConfigImpl extends WxCpDefaultConfigImpl {
 
     @Override
     public void updateAccessToken(WxAccessToken accessToken) {
-        redisOps.setValue(this.accessTokenKey, accessToken.getAccessToken(), accessToken.getExpiresIn(), TimeUnit.SECONDS);
+        redisOps.setValue(this.accessTokenKey, accessToken.getAccessToken(),
+            accessToken.getExpiresIn(), TimeUnit.SECONDS);
     }
 
     @Override
@@ -134,7 +139,8 @@ public class WeComRedisConfigImpl extends WxCpDefaultConfigImpl {
 
     @Override
     public void updateAgentJsapiTicket(String agentJsapiTicket, int expiresInSeconds) {
-        redisOps.setValue(this.agentJsapiTicketKey, agentJsapiTicket, expiresInSeconds, TimeUnit.SECONDS);
+        redisOps.setValue(this.agentJsapiTicketKey, agentJsapiTicket, expiresInSeconds,
+            TimeUnit.SECONDS);
     }
 
     @Override

@@ -9,7 +9,6 @@ import lombok.ToString;
  * js api ticket
  * </p> 
  * @author zoe zheng 
- * @date 2021/10/30 14:51
  */
 @Setter
 @Getter

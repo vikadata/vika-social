@@ -11,9 +11,8 @@ import org.slf4j.LoggerFactory;
 import com.vikadata.social.feishu.api.DepartmentOperations;
 
 /**
- *
+ * Feishu department list pager.
  * @author Shawn Deng
- * @date 2021-05-13 13:41:38
  */
 public class FeishuDepartmentListPager implements Iterator<List<FeishuDepartmentInfo>> {
 

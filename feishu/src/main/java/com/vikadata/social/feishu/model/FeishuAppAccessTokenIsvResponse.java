@@ -6,11 +6,10 @@ import lombok.ToString;
 
 /**
  * <p>
- *
+ * feishu app access token isv response.
  * </p>
  *
  * @author Shawn Deng
- * @date 2020/11/21 16:33
  */
 @Setter
 @Getter

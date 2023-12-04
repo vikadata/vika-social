@@ -7,11 +7,10 @@ import java.util.Map;
 
 /**
  * <p>
- *
+ * Confirm Component.
  * </p>
  *
  * @author Shawn Deng
- * @date 2020/11/24 12:55
  */
 public class Confirm implements CardComponent {
 

@@ -7,8 +7,9 @@ import com.vikadata.social.feishu.model.v3.Avatar;
 import com.vikadata.social.feishu.model.v3.FeishuUserObject;
 
 /**
+ * feishu passport user info.
+ *
  * @author Shawn Deng
- * @date 2020-11-26 16:00:37
  */
 @Setter
 @Getter

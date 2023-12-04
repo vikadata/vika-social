@@ -6,11 +6,10 @@ import lombok.ToString;
 
 /**
  * <p>
- *
+ * feishu check user admin request.
  * </p>
  *
  * @author Shawn Deng
- * @date 2020/12/7 11:10
  */
 @Getter
 @Setter

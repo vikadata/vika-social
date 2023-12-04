@@ -1,8 +1,8 @@
 package com.vikadata.social.qq.model;
 
 /**
+ * base response.
  * @author Shawn Deng
- * @date 2021-01-11 18:59:57
  */
 public class BaseResponse {
 

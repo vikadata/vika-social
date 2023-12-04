@@ -12,6 +12,7 @@ public interface DingTalkRedisOperations {
 
     /**
      * get the value of the specified key
+     *
      * @param key Redis Key
      * @return value
      */
@@ -55,23 +56,22 @@ public interface DingTalkRedisOperations {
     /**
      * save hash map
      *
-     * @param key redis key
-     * @param value map key=>value
+     * @param key   redis key
+     * @param value key value
      */
     void setHashMapAllValue(String key, Map<String, Object> value);
 
     /**
-     * Save a single key=>value
+     * Save a single key
      *
-     * @param key redis key
+     * @param key   redis key
      * @param field map key
      * @param value map value
      */
     void setHashMapValue(String key, String field, Object value);
 
     /**
-     *
-     * @param key redis key
+     * @param key   redis key
      * @param field map key
      * @return map value
      */
@@ -81,14 +81,14 @@ public interface DingTalkRedisOperations {
      * get all values
      *
      * @param key redis key
-     * @return List<Object>
+     * @return object list
      */
     List<Object> getHashMapValues(String key);
 
     /**
      * operation set
      *
-     * @param key redis key
+     * @param key   redis key
      * @param value value
      */
     void addSetValue(String key, String value);
@@ -97,21 +97,23 @@ public interface DingTalkRedisOperations {
      * get all values
      *
      * @param key redis key
+     * @return values
      */
     List<String> getSetValues(String key);
 
     /**
      * Determine whether there is a key value in the hash Map
      *
-     * @param key redis key
+     * @param key   redis key
      * @param field field
      * @return boolean
      */
     Boolean hasMapKey(String key, String field);
 
     /**
-     * Check if the key exists
+     * Check if the key exists.
      *
+     * @param key redis key
      * @return Boolean
      */
     Boolean hasKey(String key);

@@ -82,6 +82,7 @@ public class WxCpIsvServiceImpl extends WxCpTpServiceImpl {
      * @param authCorpId Authorized corp id
      * @param agentId The id after the app is installed
      * @return application's administrator
+     * @throws WxErrorException WxErrorException
      */
     public WxCpIsvAdmin getAuthCorpAdminList(String authCorpId, Integer agentId) throws WxErrorException {
 
@@ -98,6 +99,7 @@ public class WxCpIsvServiceImpl extends WxCpTpServiceImpl {
      * Generate registration code based on registration template
      * @param templateId Registration Template ID
      * @return Registration code information
+     * @throws WxErrorException WxErrorException
      */
     public WxCpIsvGetRegisterCode getRegisterCode(String templateId) throws WxErrorException {
 
@@ -117,6 +119,7 @@ public class WxCpIsvServiceImpl extends WxCpTpServiceImpl {
      * @param authCorpId Authorized corp id
      * @param message message body
      * @return send result
+     * @throws WxErrorException WxErrorException
      */
     public WxCpMessageSendResult sendMessage(String authCorpId, WxCpMessage message) throws WxErrorException {
 
@@ -132,6 +135,7 @@ public class WxCpIsvServiceImpl extends WxCpTpServiceImpl {
      *
      * @param orderId Order ID
      * @return order details
+     * @throws WxErrorException WxErrorException
      */
     public WxCpIsvGetOrder getOrder(String orderId) throws WxErrorException {
 
@@ -150,6 +154,7 @@ public class WxCpIsvServiceImpl extends WxCpTpServiceImpl {
      * @param testMode specifies the order to pull the official or test authorization. The default value is 0, where
      * 0 - official authorization, 1 - test authorization.
      * @return order list
+     * @throws WxErrorException WxErrorException
      */
     public WxCpIsvGetOrderList getOrderList(Long startTimeSecond, Long endTimeSecond, int testMode) throws WxErrorException {
 

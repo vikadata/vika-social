@@ -5,8 +5,9 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
+ * feishu order detail response.
+ *
  * @author zoe zheng
- * @date 2021/12/28 4:44 PM
  */
 @Setter
 @Getter

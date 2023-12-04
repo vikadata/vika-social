@@ -8,11 +8,10 @@ import java.util.List;
 
 /**
  * <p>
- *
+ * feishu send message batch response.
  * </p>
  *
  * @author Shawn Deng
- * @date 2020/12/2 11:08
  */
 @Setter
 @Getter

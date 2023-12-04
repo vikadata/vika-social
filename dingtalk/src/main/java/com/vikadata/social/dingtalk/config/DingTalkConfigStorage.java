@@ -25,7 +25,8 @@ public interface DingTalkConfigStorage {
 
     /**
      * Get all agent apps
-     * @return List<AgentApp>
+     *
+     * @return agent app list
      */
     List<AgentApp> getAllAgentApps();
 

@@ -6,14 +6,16 @@ import com.vikadata.social.feishu.model.FeishuCheckUserAdminResponse;
 import com.vikadata.social.feishu.model.FeishuOrderDetailResponse;
 
 /**
+ * feishu app operations.
+ *
  * @author Shawn Deng
- * @date 2020-11-18 15:59:48
  */
 public interface AppOperations {
 
     FeishuAdminUserListResponse getAppAdminList(String tenantKey);
 
-    FeishuCheckUserAdminResponse checkAppAdmin(String tenantKey, FeishuCheckUserAdminRequest request);
+    FeishuCheckUserAdminResponse checkAppAdmin(String tenantKey,
+                                               FeishuCheckUserAdminRequest request);
 
     FeishuOrderDetailResponse getOrderDetail(String tenantKey, String orderId);
 

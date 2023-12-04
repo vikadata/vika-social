@@ -1,9 +1,8 @@
 package com.vikadata.social.qq;
 
 /**
- *
+ * QQ exception.
  * @author Shawn Deng
- * @date 2021-04-13 17:39:59
  */
 public class QQException extends Exception {
 

@@ -35,6 +35,7 @@ public class WxCpIsvUserServiceImpl extends WxCpTpUserServiceImpl {
      * @param status Member status
      * @param authCorpId Authorized corporate ID
      * @return Member information under the department
+     * @throws WxErrorException WxErrorException
      */
     public List<WxCpUser> listSimpleByDepartment(Long departId, Boolean fetchChild, Integer status, String authCorpId)
             throws WxErrorException {

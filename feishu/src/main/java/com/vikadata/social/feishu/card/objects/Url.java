@@ -7,11 +7,10 @@ import java.util.Map;
 
 /**
  * <p>
- *
+ * Url Component.
  * </p>
  *
  * @author Shawn Deng
- * @date 2020/11/24 13:17
  */
 public class Url implements CardComponent {
 

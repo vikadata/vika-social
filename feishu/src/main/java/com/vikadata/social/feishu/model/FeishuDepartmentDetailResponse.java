@@ -5,8 +5,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
+ * feishu department detail response.
  * @author Shawn Deng
- * @date 2020-12-09 11:02:26
  */
 @Setter
 @Getter

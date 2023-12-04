@@ -91,22 +91,25 @@ public class DingTalkServiceProvider {
     /**
      * event subscription push
      *
-     * @param agentId The agent ID of the app
+     * @param agentId      The agent ID of the app
      * @param msgSignature message body signature
-     * @param nonce random string
-     * @param encryptMsg Push the encrypt in the body data
+     * @param timeStamp    timestamp
+     * @param nonce        random string
+     * @param encryptMsg   Push the encrypt in the body data
      * @return String
      */
-    public String eventNotify(String agentId, String msgSignature, String timeStamp, String nonce, String encryptMsg) {
+    public String eventNotify(String agentId, String msgSignature, String timeStamp, String nonce,
+                              String encryptMsg) {
         // Parse into JSON structure
-        AgentApp agentApp = getDingTalkTemplate().getDingTalkConfig().getAgentAppStorage().getAgentApp(agentId);
+        AgentApp agentApp =
+            getDingTalkTemplate().getDingTalkConfig().getAgentAppStorage().getAgentApp(agentId);
         DingTalkCallbackCrypto callbackCrypto;
         String decryptMsg;
         try {
-            callbackCrypto = new DingTalkCallbackCrypto(agentApp.getToken(), agentApp.getAesKey(), agentApp.getCustomKey());
+            callbackCrypto = new DingTalkCallbackCrypto(agentApp.getToken(), agentApp.getAesKey(),
+                agentApp.getCustomKey());
             decryptMsg = callbackCrypto.getDecryptMsg(msgSignature, timeStamp, nonce, encryptMsg);
-        }
-        catch (DingTalkEncryptException e) {
+        } catch (DingTalkEncryptException e) {
             LOGGER.error("DingTalk failed to parse event data", e);
             return "";
         }
@@ -128,7 +131,8 @@ public class DingTalkServiceProvider {
         LOGGER.info("DingTalk push eventType[{}]", eventType);
         BaseEvent event = eventParser.parseEvent(eventTag, eventJson);
         if (event == null) {
-            LOGGER.info("Cannot find DingTalk event listener, Whether a handler is not configured for this event, not handle by default");
+            LOGGER.info(
+                "Cannot find DingTalk event listener, Whether a handler is not configured for this event, not handle by default");
             return "";
         }
         // Determine the current agent Id
@@ -139,8 +143,7 @@ public class DingTalkServiceProvider {
         try {
             Map<String, String> jsonMap = callbackCrypto.getEncryptedMap("success");
             return JSONUtil.toJsonStr(jsonMap);
-        }
-        catch (DingTalkEncryptException e) {
+        } catch (DingTalkEncryptException e) {
             LOGGER.error("DingTalk encryption return message failed", e);
             return "";
         }
@@ -149,22 +152,23 @@ public class DingTalkServiceProvider {
     /**
      * SyncHTTP ISV DingTalk event subscription push method
      *
-     * @param suiteId suite Id
+     * @param suiteId      suite Id
      * @param msgSignature message body signature
-     * @param nonce random string
-     * @param encryptMsg Push the encrypt in the body data
+     * @param timeStamp    timestamp
+     * @param nonce        random string
+     * @param encryptMsg   Push the encrypt in the body data
      * @return response result
      */
-    public String syncHttpEventNotifyForIsv(String suiteId, String msgSignature, String timeStamp, String nonce,
-            String encryptMsg) {
+    public String syncHttpEventNotifyForIsv(String suiteId, String msgSignature, String timeStamp,
+                                            String nonce,
+                                            String encryptMsg) {
         // Parse into JSON structure
         DingTalkCallbackCrypto callbackCrypto;
         String decryptMsg;
         try {
             callbackCrypto = getIsvDingTalkCallbackCrypto(suiteId);
             decryptMsg = callbackCrypto.getDecryptMsg(msgSignature, timeStamp, nonce, encryptMsg);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LOGGER.error("DingTalk isv parse event error", e);
             return "";
         }
@@ -178,10 +182,10 @@ public class DingTalkServiceProvider {
             return "";
         }
         try {
-            Map<String, String> jsonMap = callbackCrypto.getEncryptedMap(DING_TALK_CALLBACK_SUCCESS);
+            Map<String, String> jsonMap =
+                callbackCrypto.getEncryptedMap(DING_TALK_CALLBACK_SUCCESS);
             return JSONUtil.toJsonStr(jsonMap);
-        }
-        catch (DingTalkEncryptException e) {
+        } catch (DingTalkEncryptException e) {
             LOGGER.error("DingTalk isv encryption return message failed", e);
             return "";
         }
@@ -190,12 +194,14 @@ public class DingTalkServiceProvider {
     /**
      * Parse and handle events
      *
-     * @param bizId suite ID/ biz id
+     * @param bizId     suite ID/ biz id
      * @param eventJson event message body
-     * @param corpId corp id, can be null
+     * @param corpId    corp id, can be null
+     * @param suiteId   suite id, can be null
      * @return Object
      */
-    public Object handleIsvAppEventNotify(String bizId, JSONObject eventJson, String corpId, String suiteId) {
+    public Object handleIsvAppEventNotify(String bizId, JSONObject eventJson, String corpId,
+                                          String suiteId) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("DingTalk isv event data:[{}]", eventJson);
         }
@@ -225,13 +231,13 @@ public class DingTalkServiceProvider {
                 eventJson.set(EVENT_SYNC_ACTION_SUITE_ID_KEY, suiteId);
             }
             event = eventParser.parseEvent(syncAction, eventJson);
-        }
-        else {
+        } else {
             LOGGER.info("DingTalk isv eventType[{}]", eventType);
             event = eventParser.parseEvent(eventTag, eventJson);
         }
         if (event == null) {
-            LOGGER.info("Cannot find DingTalk isv event listener, Whether a handler is not configured for this event, not handle by default");
+            LOGGER.info(
+                "Cannot find DingTalk isv event listener, Whether a handler is not configured for this event, not handle by default");
             return DING_TALK_CALLBACK_SUCCESS;
         }
         return eventListenerManager.fireEventCallback(bizId, event);
@@ -244,9 +250,9 @@ public class DingTalkServiceProvider {
             return null;
         }
         try {
-            return new DingTalkCallbackCrypto(isvApp.getToken(), isvApp.getAesKey(), isvApp.getSuiteKey());
-        }
-        catch (DingTalkEncryptException e) {
+            return new DingTalkCallbackCrypto(isvApp.getToken(), isvApp.getAesKey(),
+                isvApp.getSuiteKey());
+        } catch (DingTalkEncryptException e) {
             LOGGER.error("DingTalk decrypt data error", e);
             return null;
         }

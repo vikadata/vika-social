@@ -7,11 +7,10 @@ import java.util.Map;
 
 /**
  * <p>
- *
+ * Field Component.
  * </p>
  *
  * @author Shawn Deng
- * @date 2020/11/24 13:14
  */
 public class Field implements CardComponent {
 

@@ -1,8 +1,8 @@
 package com.vikadata.social.feishu.model;
 
 /**
+ * feishu error.
  * @author Shawn Deng
- * @date 2020-11-18 19:28:16
  */
 public class FeishuError {
 

@@ -16,7 +16,6 @@ import com.vikadata.social.feishu.model.v3.FeishuUserObject;
  * The new version of the contact authorization scope changes
  *
  * @author Shawn Deng
- * @date 2020-12-22 14:24:40
  */
 @Setter
 @Getter

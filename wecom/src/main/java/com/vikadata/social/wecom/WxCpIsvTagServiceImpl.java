@@ -23,9 +23,12 @@ public class WxCpIsvTagServiceImpl extends WxCpTpTagServiceImpl {
 
     /**
      * Override the get tag member interface
-     * @see #get(String) There is a problem with the original interface and no access_token is provided
-     * @param tagId Tag ID
+     *
+     * @param tagId      Tag ID
      * @param authCorpId corp ID
+     * @return Tag member list
+     * @see #get(String) There is a problem with the original interface and no access_token is provided
+     * @throws WxErrorException WxErrorException
      */
     public WxCpTpTagGetResult get(String tagId, String authCorpId) throws WxErrorException {
 

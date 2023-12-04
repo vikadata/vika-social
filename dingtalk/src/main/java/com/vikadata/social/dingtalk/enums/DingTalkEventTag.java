@@ -113,13 +113,14 @@ public enum DingTalkEventTag {
     /**
      * Get basic events
      *
-     * @return List<DingTalkEvent>
+     * @return event list
      */
     public static List<String> baseEvent() {
-        return Arrays.asList(USER_ADD_ORG.getValue(), USER_MODIFY_ORG.getValue(), USER_LEAVE_ORG.getValue(),
-                USER_ACTIVATE_ORG.getValue(), ORG_ADMIN_ADD.getValue(), ORG_ADMIN_REMOVE.getValue(),
-                ORG_DEPT_CREATE.getValue(), ORG_DEPT_MODIFY.getValue(), ORG_DEPT_REMOVE.getValue(),
-                ORG_REMOVE.getValue());
+        return Arrays.asList(USER_ADD_ORG.getValue(), USER_MODIFY_ORG.getValue(),
+            USER_LEAVE_ORG.getValue(),
+            USER_ACTIVATE_ORG.getValue(), ORG_ADMIN_ADD.getValue(), ORG_ADMIN_REMOVE.getValue(),
+            ORG_DEPT_CREATE.getValue(), ORG_DEPT_MODIFY.getValue(), ORG_DEPT_REMOVE.getValue(),
+            ORG_REMOVE.getValue());
     }
 
     public static Boolean isSyncHttpEvent(DingTalkEventTag tag) {
@@ -127,7 +128,8 @@ public enum DingTalkEventTag {
     }
 
     public static Boolean shouldHandleSyncHttpEvent(DingTalkEventTag tag) {
-        return !tag.equals(CHECK_URL) && !tag.equals(CHECK_UPDATE_SUITE_URL) && !tag.equals(CHECK_CREATE_SUITE_URL);
+        return !tag.equals(CHECK_URL) && !tag.equals(CHECK_UPDATE_SUITE_URL) &&
+            !tag.equals(CHECK_CREATE_SUITE_URL);
     }
 
     public String getValue() {

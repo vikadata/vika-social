@@ -12,8 +12,9 @@ import java.util.Map;
 import static com.vikadata.social.feishu.FeishuBase.API_URL_BASE;
 
 /**
+ * abstract feishu operations class.
+ *
  * @author Shawn Deng
- * @date 2020-11-18 15:39:17
  */
 public abstract class AbstractFeishuOperations {
 
@@ -45,9 +46,9 @@ public abstract class AbstractFeishuOperations {
 
         m.forEach((key, value) -> {
             if (value instanceof List) {
-                ((List) value).forEach(v -> sb.append(key).append("=").append(v.toString()).append("&"));
-            }
-            else {
+                ((List) value).forEach(
+                    v -> sb.append(key).append("=").append(v.toString()).append("&"));
+            } else {
                 sb.append(key).append("=").append(value.toString()).append("&");
             }
         });

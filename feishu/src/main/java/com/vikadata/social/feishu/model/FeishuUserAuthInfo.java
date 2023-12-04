@@ -4,8 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
+ * feishu user auth info.
+ *
  * @author Shawn Deng
- * @date 2020-11-26 16:00:37
  */
 @Setter
 @Getter

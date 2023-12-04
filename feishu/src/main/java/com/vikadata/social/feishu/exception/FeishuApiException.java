@@ -1,8 +1,9 @@
 package com.vikadata.social.feishu.exception;
 
 /**
+ * feishu api exception.
+ *
  * @author Shawn Deng
- * @date 2020-11-21 23:30:35
  */
 public class FeishuApiException extends RuntimeException {
 

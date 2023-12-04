@@ -1,9 +1,9 @@
 package com.vikadata.social.feishu.api;
 
 /**
- * picture interface
+ * image operations.
+ *
  * @author Shawn Deng
- * @date 2021-07-07 15:27:07
  */
 public interface ImageOperations {
 

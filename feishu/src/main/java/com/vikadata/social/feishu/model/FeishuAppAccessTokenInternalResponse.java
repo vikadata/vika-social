@@ -5,12 +5,12 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
-* <p>
-*
-* </p>
-* @author Shawn Deng
-* @date 2020/11/21 16:30
-*/
+ * <p>
+ * feishu app access token internal response.
+ * </p>
+ *
+ * @author Shawn Deng
+ */
 @Setter
 @Getter
 @ToString

@@ -7,8 +7,9 @@ import lombok.ToString;
 import java.util.List;
 
 /**
+ * Feishu contact scope.
+ *
  * @author Shawn Deng
- * @date 2020-12-09 11:02:26
  */
 @Setter
 @Getter

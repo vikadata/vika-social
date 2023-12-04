@@ -77,7 +77,7 @@ public interface IsvAppOperations {
     /**
      * Obtain enterprise authorization information
      * When third-party enterprise applications and customized service providers develop internal enterprise applications for enterprises,
-     * call this API to obtain enterprise authorization information。
+     * call this API to obtain enterprise authorization information.
      *
      * @param suiteId suite id
      * @param authCorpId The corpid of the authorized enterprise
@@ -100,7 +100,7 @@ public interface IsvAppOperations {
      * Get the identity information of the application administrator
      *
      * @param suiteId suite id
-     * @param code The code brought to the URL through Oauth authentication。
+     * @param code The code brought to the URL through Oauth authentication.
      * @return DingTalkSsoUserInfoResponse
      */
     DingTalkSsoUserInfoResponse getSsoUserInfoByCode(String suiteId, String code);
@@ -198,7 +198,7 @@ public interface IsvAppOperations {
 
     /**
      * In-app purchase order processing completed
-     * Call this interface to complete in-app purchase order processing。
+     * Call this interface to complete in-app purchase order processing.
      *
      * @param suiteId suite id
      * @param authCorpId The corpid of the authorized enterprise

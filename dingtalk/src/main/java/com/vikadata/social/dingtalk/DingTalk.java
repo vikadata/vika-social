@@ -27,6 +27,7 @@ public interface DingTalk {
 
     /**
      * isv market application interface
+     * @return IsvAppOperations
      */
     IsvAppOperations isvAppOperations();
 }

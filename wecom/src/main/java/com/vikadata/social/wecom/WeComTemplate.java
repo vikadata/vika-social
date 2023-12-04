@@ -43,12 +43,14 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClientException;
 
-public class WeComTemplate extends AbstractWeComTemplate implements ApplicationContextAware, InitializingBean {
+public class WeComTemplate extends AbstractWeComTemplate
+    implements ApplicationContextAware, InitializingBean {
 
     /*
      * Define the Service thread variable of the WeCom API
@@ -57,29 +59,29 @@ public class WeComTemplate extends AbstractWeComTemplate implements ApplicationC
      */
     private final static ThreadLocal<WxCpService> THREAD_LOCAL = new ThreadLocal<>();
 
-    private static final Map<String, WxCpTpService> ISV_SERVICES = Maps.newHashMapWithExpectedSize(1);
+    private static final Map<String, WxCpTpService> ISV_SERVICES =
+        Maps.newHashMapWithExpectedSize(1);
 
-    private static final Map<String, WxCpTpTagService> ISV_TAG_SERVICES = Maps.newHashMapWithExpectedSize(1);
+    private static final Map<String, WxCpTpTagService> ISV_TAG_SERVICES =
+        Maps.newHashMapWithExpectedSize(1);
 
-    private static final Map<String, WxCpTpMessageRouter> ISV_ROUTERS = Maps.newHashMapWithExpectedSize(16);
+    private static final Map<String, WxCpTpMessageRouter> ISV_ROUTERS =
+        Maps.newHashMapWithExpectedSize(16);
 
     private ApplicationContext applicationContext;
 
     /*
      * The construction method needs to be specified, the storage strategy
      */
-    public WeComTemplate(WeComConfig weComConfig) {
-        this(weComConfig, null);
-    }
-
-    public WeComTemplate(WeComConfig weComConfig, WxRedisOps wxRedisOps) {
-        super.weComConfig = weComConfig;
-
+    public WeComTemplate(WeComConfig weComConfig, StringRedisTemplate stringRedisTemplate,
+                         WxRedisOps wxRedisOps) {
+        super(weComConfig, stringRedisTemplate);
         generateIsvList(wxRedisOps, weComConfig.getIsvAppList());
     }
 
     /**
      * Create isv app onfiguration
+     *
      * @param isvAppList isv app configuration information list
      */
     private void generateIsvList(WxRedisOps wxRedisOps, List<IsvApp> isvAppList) {
@@ -88,15 +90,15 @@ public class WeComTemplate extends AbstractWeComTemplate implements ApplicationC
             isvAppList.forEach(isvApp -> {
                 WxCpTpService isvService = new WxCpIsvServiceImpl();
                 WxCpTpRedissonConfigImpl configStorage = WxCpTpRedissonConfigImpl.builder()
-                        .wxRedisOps(wxRedisOps)
-                        .keyPrefix("vikadata:wecom:isv")
-                        .corpId(isvApp.getCorpId())
-                        .providerSecret(isvApp.getProviderSecret())
-                        .suiteId(isvApp.getSuiteId())
-                        .suiteSecret(isvApp.getSuiteSecret())
-                        .token(isvApp.getToken())
-                        .aesKey(isvApp.getAesKey())
-                        .build();
+                    .wxRedisOps(wxRedisOps)
+                    .keyPrefix("vikadata:wecom:isv")
+                    .corpId(isvApp.getCorpId())
+                    .providerSecret(isvApp.getProviderSecret())
+                    .suiteId(isvApp.getSuiteId())
+                    .suiteSecret(isvApp.getSuiteSecret())
+                    .token(isvApp.getToken())
+                    .aesKey(isvApp.getAesKey())
+                    .build();
                 isvService.setWxCpTpConfigStorage(configStorage);
                 ISV_SERVICES.put(isvApp.getSuiteId(), isvService);
                 ISV_TAG_SERVICES.put(isvApp.getSuiteId(), new WxCpIsvTagServiceImpl(isvService));
@@ -108,8 +110,9 @@ public class WeComTemplate extends AbstractWeComTemplate implements ApplicationC
     /**
      * Switch to the corresponding enterprise application service
      * Unable to use temporary authorization service
-     * @param corpId    corp id
-     * @param agentId   application id
+     *
+     * @param corpId  corp id
+     * @param agentId application id
      */
     public void switchoverTo(String corpId, Integer agentId) {
         this.switchoverTo(corpId, agentId, false);
@@ -119,9 +122,9 @@ public class WeComTemplate extends AbstractWeComTemplate implements ApplicationC
      * Switch to the corresponding enterprise application service Service
      * isTempAuthService=true temporary authorization service available
      *
-     * @param corpId                corp Id
-     * @param agentId               agent Id
-     * @param isTempAuthService     temporary authorization service
+     * @param corpId            corp Id
+     * @param agentId           agent Id
+     * @param isTempAuthService temporary authorization service
      */
     public void switchoverTo(String corpId, Integer agentId, boolean isTempAuthService) {
         WxCpService service = null;
@@ -129,8 +132,7 @@ public class WeComTemplate extends AbstractWeComTemplate implements ApplicationC
         boolean isExistService = isExistService(key, isTempAuthService);
         if (isExistService && !isTempAuthService) {
             service = cpServices.get(key);
-        }
-        else if (isExistService) {
+        } else if (isExistService) {
             service = cpServicesByTempAuth.get(key, false);
         }
 
@@ -142,7 +144,8 @@ public class WeComTemplate extends AbstractWeComTemplate implements ApplicationC
 
     @Override
     public WxCpService openService() {
-        return Optional.of(THREAD_LOCAL.get()).orElseThrow(() -> new RuntimeException("get wecom service fail"));
+        return Optional.of(THREAD_LOCAL.get())
+            .orElseThrow(() -> new RuntimeException("get wecom service fail"));
     }
 
     @Override
@@ -193,7 +196,7 @@ public class WeComTemplate extends AbstractWeComTemplate implements ApplicationC
     }
 
     /**
-     * Add domain resolution value <br/>
+     * Add domain resolution value
      * <ul>
      *     <li>fixed top-level domain：vika.(cn/ltd)</li>
      *     <li>If you create a second-level domain - domainName：second-level；result：second-level.vika.cn</li>
@@ -205,27 +208,30 @@ public class WeComTemplate extends AbstractWeComTemplate implements ApplicationC
      */
     public String addEnpDomainName(String domainPrefix) {
         try {
-            ActionEnpApiResponse response = actionEnpDomainApi("add", domainPrefix, ActionEnpApiResponse.class);
+            ActionEnpApiResponse response =
+                actionEnpDomainApi("add", domainPrefix, ActionEnpApiResponse.class);
             if (null == response) {
-                throw new WeComApiException(WeComExceptionConstants.APPLY_ENP_DOMAIN_ERR_CODE, "apply domain response error");
+                throw new WeComApiException(WeComExceptionConstants.APPLY_ENP_DOMAIN_ERR_CODE,
+                    "apply domain response error");
             }
             ActionEnpApiResponse.Data data = response.getData();
-            if (!response.getSuccess() || Objects.isNull(data) || StrUtil.isBlank(data.getDomainName())) {
+            if (!response.getSuccess() || Objects.isNull(data) ||
+                StrUtil.isBlank(data.getDomainName())) {
                 LOGGER.error("failed to apply domain: {}", response.getError());
-                throw new WeComApiException(WeComExceptionConstants.APPLY_ENP_DOMAIN_ERR_CODE, "failed to apply domain");
+                throw new WeComApiException(WeComExceptionConstants.APPLY_ENP_DOMAIN_ERR_CODE,
+                    "failed to apply domain");
             }
             return data.getDomainName();
-        }
-        catch (RestClientException e) {
+        } catch (RestClientException e) {
             LOGGER.error("create business domain error: ", e);
             throw new WeComApiException("create business domain error");
         }
     }
 
     /**
-     * Delete the domain name resolution value <br/>
+     * Delete the domain name resolution value
      * <p>
-     *   domainName：second-level、asw1.enp
+     * domainName：second-level、asw1.enp
      * </p>
      *
      * @param domainPrefix domain prefix
@@ -233,26 +239,28 @@ public class WeComTemplate extends AbstractWeComTemplate implements ApplicationC
      */
     public boolean removeEnpDomainName(String domainPrefix) {
         try {
-            ActionEnpApiResponse response = actionEnpDomainApi("delete", domainPrefix, ActionEnpApiResponse.class);
+            ActionEnpApiResponse response =
+                actionEnpDomainApi("delete", domainPrefix, ActionEnpApiResponse.class);
             if (null == response) {
-                throw new WeComApiException(WeComExceptionConstants.DELETE_ENP_DOMAIN_ERR_CODE, "revocation of domain response error");
+                throw new WeComApiException(WeComExceptionConstants.DELETE_ENP_DOMAIN_ERR_CODE,
+                    "revocation of domain response error");
             }
             if (!response.getSuccess()) {
                 LOGGER.error("revocation of domain error: {}", response.getError());
-                throw new WeComApiException(WeComExceptionConstants.DELETE_ENP_DOMAIN_ERR_CODE, "revocation of domain error");
+                throw new WeComApiException(WeComExceptionConstants.DELETE_ENP_DOMAIN_ERR_CODE,
+                    "revocation of domain error");
             }
             return true;
-        }
-        catch (RestClientException e) {
+        } catch (RestClientException e) {
             LOGGER.error("delete domain error: ", e);
             throw new WeComApiException("delete domain error");
         }
     }
 
     /**
-     * Verify the domain resolution value <br/>
+     * Verify the domain resolution value
      * <p>
-     *   domainName：second-level、asw1.enp
+     * domainName：second-level、asw1.enp
      * </p>
      *
      * @param domainPrefix domain prefix
@@ -260,21 +268,23 @@ public class WeComTemplate extends AbstractWeComTemplate implements ApplicationC
      */
     public Data checkEnpDomainName(String domainPrefix) {
         try {
-            CheckEnpApiResponse response = actionEnpDomainApi("check", domainPrefix, CheckEnpApiResponse.class);
+            CheckEnpApiResponse response =
+                actionEnpDomainApi("check", domainPrefix, CheckEnpApiResponse.class);
             if (null == response) {
-                throw new WeComApiException(WeComExceptionConstants.CHECK_ENP_DOMAIN_ERR_CODE, "check domain response error");
+                throw new WeComApiException(WeComExceptionConstants.CHECK_ENP_DOMAIN_ERR_CODE,
+                    "check domain response error");
             }
             Data data = response.getData();
             if (!response.getSuccess()) {
                 LOGGER.error("check domain error: {}", response.getError());
-                throw new WeComApiException(WeComExceptionConstants.CHECK_ENP_DOMAIN_ERR_CODE, "check domain error");
+                throw new WeComApiException(WeComExceptionConstants.CHECK_ENP_DOMAIN_ERR_CODE,
+                    "check domain error");
             }
             if (Objects.nonNull(data) && StrUtil.isNotBlank(data.getIpList())) {
                 return data;
             }
             return null;
-        }
-        catch (RestClientException e) {
+        } catch (RestClientException e) {
             LOGGER.error("check domain error: ", e);
             throw new WeComApiException("check domain error");
         }
@@ -283,7 +293,7 @@ public class WeComTemplate extends AbstractWeComTemplate implements ApplicationC
     /**
      * Call api operations to add, delete and other domain resolution actions
      * <p>
-     *     actionOp support parameters: add/delete/check
+     * actionOp support parameters: add/delete/check
      * </p>
      *
      * @param actionOp     request action
@@ -291,7 +301,10 @@ public class WeComTemplate extends AbstractWeComTemplate implements ApplicationC
      * @return request result
      * @throws RestClientException
      */
-    private <T extends EnpDdnsApiBaseResponse> T actionEnpDomainApi(String actionOp, String domainPrefix, Class<T> responseType) throws RestClientException {
+    private <T extends EnpDdnsApiBaseResponse> T actionEnpDomainApi(String actionOp,
+                                                                    String domainPrefix,
+                                                                    Class<T> responseType)
+        throws RestClientException {
         OperateEnpDdns autoCreateDdns = super.getConfig().getOperateEnpDdns();
         String url = autoCreateDdns.getApiHost() + autoCreateDdns.getActionDdnsUrl();
 
@@ -316,10 +329,10 @@ public class WeComTemplate extends AbstractWeComTemplate implements ApplicationC
     public void afterPropertiesSet() {
 
         List<WeComIsvMessageHandler> isvHandlers = Optional
-                .of(applicationContext.getBeansOfType(WeComIsvMessageHandler.class))
-                .filter(map -> !map.isEmpty())
-                .map(map -> new ArrayList<>(map.values()))
-                .orElse(null);
+            .of(applicationContext.getBeansOfType(WeComIsvMessageHandler.class))
+            .filter(map -> !map.isEmpty())
+            .map(map -> new ArrayList<>(map.values()))
+            .orElse(null);
         if (CollUtil.isNotEmpty(isvHandlers)) {
             ISV_SERVICES.values().forEach(isvService -> {
                 WxCpTpMessageRouter isvRouter = new WxCpTpMessageRouter(isvService);
@@ -330,21 +343,22 @@ public class WeComTemplate extends AbstractWeComTemplate implements ApplicationC
                     WeComIsvMsgType msgType = isvHandler.msgType();
                     WeComIsvMessageType messageType = isvHandler.messageType();
                     WxCpTpMessageRouterRule routerRule = isvRouter.rule()
-                            .async(isvHandler.async())
-                            .msgType(msgType == WeComIsvMsgType.EVENT ? "event" :
-                                    msgType == WeComIsvMsgType.INFO_TYPE ? null : messageType.getInfoType())
-                            .event(msgType == WeComIsvMsgType.EVENT ? messageType.getInfoType() : null)
-                            .infoType(msgType == WeComIsvMsgType.INFO_TYPE ? messageType.getInfoType() : null)
-                            .handler(isvHandler);
+                        .async(isvHandler.async())
+                        .msgType(msgType == WeComIsvMsgType.EVENT ? "event" :
+                            msgType == WeComIsvMsgType.INFO_TYPE ? null : messageType.getInfoType())
+                        .event(msgType == WeComIsvMsgType.EVENT ? messageType.getInfoType() : null)
+                        .infoType(
+                            msgType == WeComIsvMsgType.INFO_TYPE ? messageType.getInfoType() : null)
+                        .handler(isvHandler);
                     if (isvHandler.next()) {
                         routerRule.next();
-                    }
-                    else {
+                    } else {
                         routerRule.end();
                     }
                 });
 
-                @SuppressWarnings("deprecation") // This method must be used to get the application suite ID
+                @SuppressWarnings("deprecation")
+                // This method must be used to get the application suite ID
                 WxCpTpConfigStorage wxCpTpConfigStorage = isvService.getWxCpTpConfigStorage();
                 ISV_ROUTERS.put(wxCpTpConfigStorage.getSuiteId(), isvRouter);
             });

@@ -1,8 +1,9 @@
 package com.vikadata.social.feishu.exception;
 
 /**
+ * feishu exception constants.
+ *
  * @author Shawn Deng
- * @date 2020-12-02 11:48:58
  */
 public class FeishuExceptionConstants {
 

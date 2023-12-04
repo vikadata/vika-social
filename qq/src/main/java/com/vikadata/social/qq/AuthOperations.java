@@ -14,6 +14,7 @@ public interface AuthOperations {
      *
      * @param code authorization code
      * @return AccessTokenInfo
+     * @throws QQException throw QQException when get access token failed
      */
     AccessTokenInfo getAccessToken(String code) throws QQException;
 
@@ -22,6 +23,7 @@ public interface AuthOperations {
      *
      * @param accessToken accessToken
      * @return WebAppAuthInfo
+     * @throws QQException throw QQException when get QQ web app authorization info failed
      */
     WebAppAuthInfo getAuthInfo(String accessToken) throws QQException;
 
@@ -31,6 +33,9 @@ public interface AuthOperations {
      * @param accessToken accessToken
      * @param appId       appId
      * @param openId      openId
+     * @return TencentUserInfo
+     * @throws QQException throw QQException when get QQ user info failed
      */
-    TencentUserInfo getTencentUserInfo(String accessToken, String appId, String openId) throws QQException;
+    TencentUserInfo getTencentUserInfo(String accessToken, String appId, String openId)
+        throws QQException;
 }

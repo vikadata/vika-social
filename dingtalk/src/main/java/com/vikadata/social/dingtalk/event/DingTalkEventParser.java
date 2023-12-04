@@ -44,7 +44,7 @@ public class DingTalkEventParser {
     public static final String SYNC_HTTP_ACTION = "sync_http_";
 
     /**
-     * DingTalkEvent event name as key，
+     * DingTalkEvent event name as key,
      * The parser corresponding to each event content, here are all Jackson library conversions
      */
     private static final Map<String, EventParser> EVENT_PARSER_MAP;

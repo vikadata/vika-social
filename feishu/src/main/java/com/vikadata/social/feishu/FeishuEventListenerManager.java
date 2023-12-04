@@ -24,12 +24,14 @@ public class FeishuEventListenerManager {
      * The processing memory corresponding to the callback event
      * Event -> callbackHandler implementation
      */
-    private final Map<Class<? extends BaseEvent>, FeishuEventCallbackHandler<?>> eventHandlerMap = new HashMap<>(16);
+    private final Map<Class<? extends BaseEvent>, FeishuEventCallbackHandler<?>> eventHandlerMap =
+        new HashMap<>(16);
 
     /**
      * The new version of the contact event corresponding processor
      */
-    private final Map<Class<? extends BaseV3ContactEvent>, FeishuV3ContactEventCallbackHandler<?>> v3ContactEventHandlerMap = new HashMap<>(16);
+    private final Map<Class<? extends BaseV3ContactEvent>, FeishuV3ContactEventCallbackHandler<?>>
+        v3ContactEventHandlerMap = new HashMap<>(16);
 
     /**
      * message interaction interface
@@ -48,12 +50,15 @@ public class FeishuEventListenerManager {
         FeishuEventCallbackHandler<T> callbackHandler = null;
         // Find the corresponding event handler
         while (callbackHandler == null && BaseEvent.class.isAssignableFrom(clazz)) {
-            callbackHandler = MapUtil.get(eventHandlerMap, clazz, new TypeReference<FeishuEventCallbackHandler<T>>() {});
+            callbackHandler = MapUtil.get(eventHandlerMap, clazz,
+                new TypeReference<FeishuEventCallbackHandler<T>>() {
+                });
             clazz = clazz.getSuperclass();
         }
 
         if (callbackHandler == null) {
-            throw new IllegalStateException("Feishu cannot find event handler" + event.getClass().getName());
+            throw new IllegalStateException(
+                "Feishu cannot find event handler" + event.getClass().getName());
         }
         return callbackHandler.doHandle(event);
     }
@@ -70,19 +75,22 @@ public class FeishuEventListenerManager {
         FeishuV3ContactEventCallbackHandler<T> callbackHandler = null;
         // Find the corresponding event handler
         while (callbackHandler == null && BaseV3ContactEvent.class.isAssignableFrom(clazz)) {
-            callbackHandler = MapUtil.get(v3ContactEventHandlerMap, clazz, new TypeReference<FeishuV3ContactEventCallbackHandler<T>>() {
-            });
+            callbackHandler = MapUtil.get(v3ContactEventHandlerMap, clazz,
+                new TypeReference<FeishuV3ContactEventCallbackHandler<T>>() {
+                });
             clazz = clazz.getSuperclass();
         }
 
         if (callbackHandler == null) {
-            throw new IllegalStateException("Feishu cannot find event handler" + event.getClass().getName());
+            throw new IllegalStateException(
+                "Feishu cannot find event handler" + event.getClass().getName());
         }
         return callbackHandler.doHandle(event);
     }
 
     /**
      * Handling card interaction events
+     *
      * @param event message card interaction events
      * @return Card message
      */
@@ -97,7 +105,8 @@ public class FeishuEventListenerManager {
      * @param handler The handler corresponding to the callback event
      * @param <T>     Events that inherit BaseEvent
      */
-    public <T extends BaseEvent> void registerEventCallbackHandler(Class<T> clazz, FeishuEventCallbackHandler<T> handler) {
+    public <T extends BaseEvent> void registerEventCallbackHandler(Class<T> clazz,
+                                                                   FeishuEventCallbackHandler<T> handler) {
         if (clazz != null && handler != null) {
             eventHandlerMap.put(clazz, handler);
         }
@@ -110,7 +119,8 @@ public class FeishuEventListenerManager {
      * @param handler The handler corresponding to the callback event
      * @param <T>     Events that inherit BaseEvent
      */
-    public <T extends BaseV3ContactEvent> void registerV3ContactEventCallbackHandler(Class<T> clazz, FeishuV3ContactEventCallbackHandler<T> handler) {
+    public <T extends BaseV3ContactEvent> void registerV3ContactEventCallbackHandler(Class<T> clazz,
+                                                                                     FeishuV3ContactEventCallbackHandler<T> handler) {
         if (clazz != null && handler != null) {
             v3ContactEventHandlerMap.put(clazz, handler);
         }
@@ -118,7 +128,8 @@ public class FeishuEventListenerManager {
 
     /**
      * Register message interaction handler
-     *ram handler message interaction handler
+     *
+     * @param handler message interaction handler
      */
     public void registerCardActionHandler(FeishuCardActionHandler handler) {
         if (handler != null) {

@@ -78,19 +78,23 @@ public class FeishuTemplate extends ApiBinding implements Feishu {
 
     private static final String OAUTH2_URL = "/authen/v1/index";
 
-    private static final String PASSPORT_ACCESS_TOKEN_URL = "https://passport.feishu.cn/suite/passport/oauth/token";
+    private static final String PASSPORT_ACCESS_TOKEN_URL =
+        "https://passport.feishu.cn/suite/passport/oauth/token";
 
-    private static final String PASSPORT_USER_INFO_URL = "https://passport.feishu.cn/suite/passport/oauth/userinfo";
+    private static final String PASSPORT_USER_INFO_URL =
+        "https://passport.feishu.cn/suite/passport/oauth/userinfo";
 
     private static final String ACCESS_TOKEN_URL = "/authen/v1/access_token";
 
     private static final String RESEND_APP_TICKET = "/auth/v3/app_ticket/resend";
 
-    private static final String GET_APP_ACCESS_TOKEN_INTERNAL = "/auth/v3/app_access_token/internal";
+    private static final String GET_APP_ACCESS_TOKEN_INTERNAL =
+        "/auth/v3/app_access_token/internal";
 
     private static final String GET_APP_ACCESS_TOKEN_ISV = "/auth/v3/app_access_token";
 
-    private static final String GET_TENANT_ACCESS_TOKEN_INTERNAL = "/auth/v3/tenant_access_token/internal";
+    private static final String GET_TENANT_ACCESS_TOKEN_INTERNAL =
+        "/auth/v3/tenant_access_token/internal";
 
     private static final String GET_TENANT_ACCESS_TOKEN_ISV = "/auth/v3/tenant_access_token";
 
@@ -133,7 +137,8 @@ public class FeishuTemplate extends ApiBinding implements Feishu {
      * @param requestFactory Request factory
      * @return ClientHttpRequestFactory
      */
-    private static ClientHttpRequestFactory bufferRequestWrapper(ClientHttpRequestFactory requestFactory) {
+    private static ClientHttpRequestFactory bufferRequestWrapper(
+        ClientHttpRequestFactory requestFactory) {
         return new BufferingClientHttpRequestFactory(requestFactory);
     }
 
@@ -147,11 +152,14 @@ public class FeishuTemplate extends ApiBinding implements Feishu {
     public void prepareTicketConfig() {
         // If you have a store app from the start, you must configure the store app ticket store
         if (this.ticketStorage == null) {
-            throw new IllegalStateException("Independent service provider applications need to provide the implementation of Ticket storage, "
-                    + "please implement the App Ticket Storage interface and inject it into Template");
+            throw new IllegalStateException(
+                "Independent service provider applications need to provide the implementation of Ticket storage, "
+                    +
+                    "please implement the App Ticket Storage interface and inject it into Template");
         }
         // Actively trigger re-send ticket at startup
-        LOGGER.info("Feishu ISV[{}], actively trigger re send ticket", defaultConfigStorage.getAppId());
+        LOGGER.info("Feishu ISV[{}], actively trigger re send ticket",
+            defaultConfigStorage.getAppId());
         resendAppTicket(defaultConfigStorage.getAppId(), defaultConfigStorage.getAppSecret());
     }
 
@@ -168,43 +176,49 @@ public class FeishuTemplate extends ApiBinding implements Feishu {
         request.setAppAccessToken(getAppAccessToken(false));
         request.setCode(code);
         request.setGrantType("authorization_code");
-        FeishuAccessTokenResponse response = this.doPost(buildUri(ACCESS_TOKEN_URL), MapUtil.newHashMap(), request, FeishuAccessTokenResponse.class);
+        FeishuAccessTokenResponse response =
+            this.doPost(buildUri(ACCESS_TOKEN_URL), MapUtil.newHashMap(), request,
+                FeishuAccessTokenResponse.class);
         FeishuAccessToken accessToken = response.getData();
-        getConfigStorage().updateUserAccessToken(accessToken.getAccessToken(), accessToken.getRefreshToken(), accessToken.getExpiresIn());
+        getConfigStorage().updateUserAccessToken(accessToken.getAccessToken(),
+            accessToken.getRefreshToken(), accessToken.getExpiresIn());
         return accessToken;
     }
 
     public FeishuPassportAccessToken getPassportAccessToken(String code, String redirectUri) {
         FeishuConfigStorage configStorage = getConfigStorage();
         HttpResponse response = HttpUtil.createPost(PASSPORT_ACCESS_TOKEN_URL)
-                .form("grant_type", "authorization_code")
-                .form("client_id", configStorage.getAppId())
-                .form("client_secret", configStorage.getAppSecret())
-                .form("code", code)
-                .form("redirect_uri", URIUtil.encodeURIComponent(redirectUri))
-                .execute();
+            .form("grant_type", "authorization_code")
+            .form("client_id", configStorage.getAppId())
+            .form("client_secret", configStorage.getAppSecret())
+            .form("code", code)
+            .form("redirect_uri", URIUtil.encodeURIComponent(redirectUri))
+            .execute();
         if (!response.isOk()) {
             throw new HttpException("Failed to get access token response:" + response.body());
         }
         try {
-            return Jackson4FeishuConverter.toObject(response.body(), new TypeReference<FeishuPassportAccessToken>() {});
-        }
-        catch (IOException e) {
+            return Jackson4FeishuConverter.toObject(response.body(),
+                new TypeReference<FeishuPassportAccessToken>() {
+                });
+        } catch (IOException e) {
             throw new HttpException("Failed to parse response body:" + response.body(), e);
         }
     }
 
     public FeishuPassportUserInfo getPassportUserInfo(String accessToken) {
         HttpResponse response = HttpUtil.createGet(PASSPORT_USER_INFO_URL)
-                .bearerAuth(accessToken)
-                .execute();
+            .bearerAuth(accessToken)
+            .execute();
         if (!response.isOk()) {
-            throw new HttpException("Failed to get user identity information response:" + response.body());
+            throw new HttpException(
+                "Failed to get user identity information response:" + response.body());
         }
         try {
-            return Jackson4FeishuConverter.toObject(response.body(), new TypeReference<FeishuPassportUserInfo>() {});
-        }
-        catch (IOException e) {
+            return Jackson4FeishuConverter.toObject(response.body(),
+                new TypeReference<FeishuPassportUserInfo>() {
+                });
+        } catch (IOException e) {
             throw new HttpException("Failed to parse response body:" + response.body(), e);
         }
     }
@@ -227,15 +241,15 @@ public class FeishuTemplate extends ApiBinding implements Feishu {
         if (this.configStorageMap == null) {
             this.configStorageMap = MapUtil.newConcurrentHashMap();
             this.configStorageMap.put(configStorage.getAppId(), configStorage);
-        }
-        else {
+        } else {
             this.configStorageMap.put(configStorage.getAppId(), configStorage);
         }
     }
 
     public FeishuConfigStorage getConfigStorage() {
         if (this.configStorageMap == null) {
-            LOGGER.error("The current application configuration memory is empty and the application "
+            LOGGER.error(
+                "The current application configuration memory is empty and the application "
                     + "configuration cannot be obtained");
             return null;
         }
@@ -244,7 +258,8 @@ public class FeishuTemplate extends ApiBinding implements Feishu {
         // you must call the switch To method to switch the context
         if (StrUtil.isBlank(FeishuConfigStorageHolder.get())) {
             // The current context application identification variable is not set, return null
-            LOGGER.error("There is currently no application context, unable to get application configuration");
+            LOGGER.error(
+                "There is currently no application context, unable to get application configuration");
             return null;
         }
         return this.configStorageMap.get(FeishuConfigStorageHolder.get());
@@ -254,13 +269,17 @@ public class FeishuTemplate extends ApiBinding implements Feishu {
         synchronized (this) {
             if (this.configStorageMap.size() == 1) {
                 this.configStorageMap.remove(appId);
-                LOGGER.warn("Last configuration removed: {}, must be added now using set Wx Mp Config Storage or set Multi Config Storages", appId);
+                LOGGER.warn(
+                    "Last configuration removed: {}, must be added now using set Wx Mp Config Storage or set Multi Config Storages",
+                    appId);
                 return;
             }
             if (FeishuConfigStorageHolder.get().equals(appId)) {
                 this.configStorageMap.remove(appId);
                 final String defaultAppId = this.configStorageMap.keySet().iterator().next();
-                LOGGER.warn("The default configuration has been deleted, [{}] is set as the default configuration", defaultAppId);
+                LOGGER.warn(
+                    "The default configuration has been deleted, [{}] is set as the default configuration",
+                    defaultAppId);
                 return;
             }
             this.configStorageMap.remove(appId);
@@ -272,7 +291,8 @@ public class FeishuTemplate extends ApiBinding implements Feishu {
      */
     public synchronized void switchDefault() {
         if (this.configStorageMap == null) {
-            LOGGER.error("Configuration memory is empty, cannot switch default application context!");
+            LOGGER.error(
+                "Configuration memory is empty, cannot switch default application context!");
             return;
         }
         if (this.configStorageMap.containsKey(defaultConfigStorage.getAppId())) {
@@ -285,6 +305,7 @@ public class FeishuTemplate extends ApiBinding implements Feishu {
 
     /**
      * Switch application configuration context
+     *
      * @param configStorage Storage
      */
     public synchronized void switchTo(FeishuConfigStorage configStorage) {
@@ -322,40 +343,45 @@ public class FeishuTemplate extends ApiBinding implements Feishu {
                 }
                 String appTicket = ticketStorage.getTicket();
                 if (appTicket == null) {
-                    throw new IllegalStateException("APP Ticket is not found, maybe not received, wait for a while and get it again");
+                    throw new IllegalStateException(
+                        "APP Ticket is not found, maybe not received, wait for a while and get it again");
                 }
                 FeishuAppAccessTokenIsvRequest request = new FeishuAppAccessTokenIsvRequest();
                 request.setAppId(getConfigStorage().getAppId());
                 request.setAppSecret(getConfigStorage().getAppSecret());
                 request.setAppTicket(appTicket);
-                FeishuAppAccessTokenIsvResponse response = this.doPost(buildUri(GET_APP_ACCESS_TOKEN_ISV), MapUtil.newHashMap(), request, FeishuAppAccessTokenIsvResponse.class);
-                getConfigStorage().updateAppAccessToken(response.getAppAccessToken(), response.getExpire());
+                FeishuAppAccessTokenIsvResponse response =
+                    this.doPost(buildUri(GET_APP_ACCESS_TOKEN_ISV), MapUtil.newHashMap(), request,
+                        FeishuAppAccessTokenIsvResponse.class);
+                getConfigStorage().updateAppAccessToken(response.getAppAccessToken(),
+                    response.getExpire());
                 return response.getAppAccessToken();
-            }
-            else {
+            } else {
                 // Enterprise self-built application
-                FeishuAppAccessTokenInternalRequest request = new FeishuAppAccessTokenInternalRequest();
+                FeishuAppAccessTokenInternalRequest request =
+                    new FeishuAppAccessTokenInternalRequest();
                 request.setAppId(getConfigStorage().getAppId());
                 request.setAppSecret(getConfigStorage().getAppSecret());
-                FeishuAppAccessTokenInternalResponse response = this.doPost(buildUri(GET_APP_ACCESS_TOKEN_INTERNAL), MapUtil.newHashMap(), request, FeishuAppAccessTokenInternalResponse.class);
-                getConfigStorage().updateAppAccessToken(response.getAppAccessToken(), response.getExpire());
+                FeishuAppAccessTokenInternalResponse response =
+                    this.doPost(buildUri(GET_APP_ACCESS_TOKEN_INTERNAL), MapUtil.newHashMap(),
+                        request, FeishuAppAccessTokenInternalResponse.class);
+                getConfigStorage().updateAppAccessToken(response.getAppAccessToken(),
+                    response.getExpire());
                 return response.getAppAccessToken();
             }
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        }
-        catch (FeishuApiException e) {
+        } catch (FeishuApiException e) {
             throw new IllegalStateException(e);
-        }
-        finally {
+        } finally {
             if (locked) {
                 lock.unlock();
             }
         }
     }
 
-    public String getTenantAccessToken(String tenantKey, boolean forceRefresh) throws FeishuApiException {
+    public String getTenantAccessToken(String tenantKey, boolean forceRefresh)
+        throws FeishuApiException {
         if (!getConfigStorage().isTenantAccessTokenExpired(tenantKey) && !forceRefresh) {
             return getConfigStorage().getTenantAccessToken(tenantKey);
         }
@@ -375,36 +401,42 @@ public class FeishuTemplate extends ApiBinding implements Feishu {
                 }
                 String appTicket = ticketStorage.getTicket();
                 if (appTicket == null) {
-                    throw new IllegalStateException("APP Ticket is not found, maybe not received, wait for a while and get it again");
+                    throw new IllegalStateException(
+                        "APP Ticket is not found, maybe not received, wait for a while and get it again");
                 }
                 FeishuTenantAccessTokenIsvRequest request = new FeishuTenantAccessTokenIsvRequest();
                 request.setAppAccessToken(getAppAccessToken(false));
                 request.setTenantKey(tenantKey);
-                FeishuTenantAccessTokenIsvResponse response = this.doPost(buildUri(GET_TENANT_ACCESS_TOKEN_ISV), MapUtil.newHashMap(), request, FeishuTenantAccessTokenIsvResponse.class);
-                getConfigStorage().updateTenantAccessToken(tenantKey, response.getTenantAccessToken(), response.getExpire());
+                FeishuTenantAccessTokenIsvResponse response =
+                    this.doPost(buildUri(GET_TENANT_ACCESS_TOKEN_ISV), MapUtil.newHashMap(),
+                        request, FeishuTenantAccessTokenIsvResponse.class);
+                getConfigStorage().updateTenantAccessToken(tenantKey,
+                    response.getTenantAccessToken(), response.getExpire());
                 return response.getTenantAccessToken();
-            }
-            else {
+            } else {
                 // enterprise self built application
-                FeishuTenantAccessTokenInternalRequest request = new FeishuTenantAccessTokenInternalRequest();
+                FeishuTenantAccessTokenInternalRequest request =
+                    new FeishuTenantAccessTokenInternalRequest();
                 request.setAppId(getConfigStorage().getAppId());
                 request.setAppSecret(getConfigStorage().getAppSecret());
-                FeishuTenantAccessTokenInternalResponse response = this.doPost(buildUri(GET_TENANT_ACCESS_TOKEN_INTERNAL), MapUtil.newHashMap(), request, FeishuTenantAccessTokenInternalResponse.class);
-                getConfigStorage().updateTenantAccessToken(tenantKey, response.getTenantAccessToken(), response.getExpire());
+                FeishuTenantAccessTokenInternalResponse response =
+                    this.doPost(buildUri(GET_TENANT_ACCESS_TOKEN_INTERNAL), MapUtil.newHashMap(),
+                        request, FeishuTenantAccessTokenInternalResponse.class);
+                getConfigStorage().updateTenantAccessToken(tenantKey,
+                    response.getTenantAccessToken(), response.getExpire());
                 return response.getTenantAccessToken();
             }
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        }
-        finally {
+        } finally {
             if (locked) {
                 lock.unlock();
             }
         }
     }
 
-    public <T extends BaseResponse> T doGet(String url, Map<String, String> headers, Class<T> responseClass) throws FeishuApiException {
+    public <T extends BaseResponse> T doGet(String url, Map<String, String> headers,
+                                            Class<T> responseClass) throws FeishuApiException {
         try {
             HttpHeaders header = null;
             if (headers != null && !headers.isEmpty()) {
@@ -413,10 +445,10 @@ public class FeishuTemplate extends ApiBinding implements Feishu {
             }
             HttpEntity<Void> request = new HttpEntity<>(header);
             LOGGER.info("Send Remote Get Request, Url : {}", url);
-            ResponseEntity<T> response = getRestTemplate().exchange(url, HttpMethod.GET, request, responseClass);
+            ResponseEntity<T> response =
+                getRestTemplate().exchange(url, HttpMethod.GET, request, responseClass);
             return handleResponse(response);
-        }
-        catch (RestClientException e) {
+        } catch (RestClientException e) {
             throw new FeishuApiException(e.getMessage());
         }
     }
@@ -425,15 +457,17 @@ public class FeishuTemplate extends ApiBinding implements Feishu {
         try {
             HttpEntity<Void> request = new HttpEntity<>(headers);
             LOGGER.info("Send Remote Get Request, Url : {}", url);
-            ResponseEntity<T> response = getRestTemplate().exchange(url, HttpMethod.GET, request, responseClass);
+            ResponseEntity<T> response =
+                getRestTemplate().exchange(url, HttpMethod.GET, request, responseClass);
             return response.getBody();
-        }
-        catch (RestClientException e) {
+        } catch (RestClientException e) {
             throw new FeishuApiException(e.getMessage());
         }
     }
 
-    public <T extends BaseResponse> T doPost(String url, Map<String, String> headers, Object requestBody, Class<T> responseClass) throws FeishuApiException {
+    public <T extends BaseResponse> T doPost(String url, Map<String, String> headers,
+                                             Object requestBody, Class<T> responseClass)
+        throws FeishuApiException {
         try {
             HttpHeaders header = null;
             if (headers != null && !headers.isEmpty()) {
@@ -442,10 +476,10 @@ public class FeishuTemplate extends ApiBinding implements Feishu {
             }
             HttpEntity<Object> entity = new HttpEntity<>(requestBody, header);
             LOGGER.info("Send Remote Post Request, Url : {}", url);
-            ResponseEntity<T> response = getRestTemplate().postForEntity(url, entity, responseClass);
+            ResponseEntity<T> response =
+                getRestTemplate().postForEntity(url, entity, responseClass);
             return handleResponse(response);
-        }
-        catch (RestClientException e) {
+        } catch (RestClientException e) {
             throw new FeishuApiException(e.getMessage());
         }
     }
@@ -458,40 +492,43 @@ public class FeishuTemplate extends ApiBinding implements Feishu {
             formData.forEach(map::add);
             HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
             LOGGER.info("Send Remote Post Form Request, Url : {}", url);
-            ResponseEntity<T> response = getRestTemplate().postForEntity(url, request, responseClass);
+            ResponseEntity<T> response =
+                getRestTemplate().postForEntity(url, request, responseClass);
             return response.getBody();
-        }
-        catch (RestClientException e) {
+        } catch (RestClientException e) {
             throw new FeishuApiException(e.getMessage());
         }
     }
 
-    private <T extends BaseResponse> T handleResponse(ResponseEntity<T> responseEntity) throws FeishuApiException {
+    private <T extends BaseResponse> T handleResponse(ResponseEntity<T> responseEntity)
+        throws FeishuApiException {
         if (responseEntity == null) {
             throw new FeishuApiException("response message can not be null");
         }
         if (!responseEntity.getStatusCode().is2xxSuccessful()) {
             if (responseEntity.getBody() != null) {
-                throw new FeishuApiException(responseEntity.getBody().getCode(), responseEntity.getBody().getMsg());
-            }
-            else {
-                throw new FeishuApiException("Failed to request Feishu server, please check network or parameters");
+                throw new FeishuApiException(responseEntity.getBody().getCode(),
+                    responseEntity.getBody().getMsg());
+            } else {
+                throw new FeishuApiException(
+                    "Failed to request Feishu server, please check network or parameters");
             }
         }
 
         if (responseEntity.getBody() != null) {
             if (responseEntity.getBody().getCode() != 0) {
-                throw new FeishuApiException(responseEntity.getBody().getCode(), responseEntity.getBody().getMsg());
+                throw new FeishuApiException(responseEntity.getBody().getCode(),
+                    responseEntity.getBody().getMsg());
             }
         }
         return responseEntity.getBody();
     }
 
-    protected <T> T retryIfInvalidTenantAccessToken(ClientCallable<T> callable, String tenantKey) throws FeishuApiException {
+    protected <T> T retryIfInvalidTenantAccessToken(ClientCallable<T> callable, String tenantKey)
+        throws FeishuApiException {
         try {
             return callable.doExecute();
-        }
-        catch (FeishuApiException e) {
+        } catch (FeishuApiException e) {
             if (e.getCode() == TENANT_ACCESS_TOKEN_INVALID) {
                 this.getTenantAccessToken(tenantKey, true);
                 return callable.doExecute();
@@ -531,7 +568,8 @@ public class FeishuTemplate extends ApiBinding implements Feishu {
         MappingJackson2HttpMessageConverter converter = super.getJsonMessageConverter();
         // All API request parameters of Feishu are in underlined format, and the attributes of the response structure are also underlined
         converter.getObjectMapper().setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
-        converter.getObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        converter.getObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return converter;
     }
 
@@ -539,6 +577,9 @@ public class FeishuTemplate extends ApiBinding implements Feishu {
      * Need to trigger in two cases:
      * 1. When starting the project, initialize the ISV store application instance, then you need to trigger the first time
      * 2. The store application instance can trigger verification when the event url is verified.
+     *
+     * @param appId     app id
+     * @param appSecret app secret
      */
     public void resendAppTicket(String appId, String appSecret) {
         FeishuResendAppTicketRequest request = new FeishuResendAppTicketRequest();
@@ -546,9 +587,9 @@ public class FeishuTemplate extends ApiBinding implements Feishu {
         request.setAppSecret(appSecret);
         // After triggering the resend of the ticket, the ticket is updated in the receiving ticket event engine
         try {
-            getRestTemplate().postForObject(StrUtil.join("/", API_URL_BASE, RESEND_APP_TICKET), request, FeishuResendAppTicketResponse.class);
-        }
-        catch (RestClientException e) {
+            getRestTemplate().postForObject(StrUtil.join("/", API_URL_BASE, RESEND_APP_TICKET),
+                request, FeishuResendAppTicketResponse.class);
+        } catch (RestClientException e) {
             throw new RuntimeException(e);
         }
     }

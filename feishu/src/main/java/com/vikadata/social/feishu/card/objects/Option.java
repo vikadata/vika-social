@@ -7,11 +7,10 @@ import java.util.Map;
 
 /**
  * <p>
- *
+ * Option Component.
  * </p>
  *
  * @author Shawn Deng
- * @date 2020/11/24 13:16
  */
 public class Option implements CardComponent {
 

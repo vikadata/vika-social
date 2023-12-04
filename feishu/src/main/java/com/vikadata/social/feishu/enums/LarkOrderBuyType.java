@@ -7,7 +7,6 @@ import lombok.Getter;
 
 /**
  * Feishu Order Type
- * @date 202/12/28 2:08 PM
  */
 @Getter
 @AllArgsConstructor

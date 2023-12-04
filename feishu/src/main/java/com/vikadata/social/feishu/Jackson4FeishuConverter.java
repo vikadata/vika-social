@@ -8,8 +8,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 
 /**
+ * jackson for feishu converter.
+ *
  * @author Shawn Deng
- * @date 2020-12-02 14:20:33
  */
 public class Jackson4FeishuConverter {
 

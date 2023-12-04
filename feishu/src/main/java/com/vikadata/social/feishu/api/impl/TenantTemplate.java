@@ -5,9 +5,9 @@ import com.vikadata.social.feishu.api.TenantOperations;
 import com.vikadata.social.feishu.model.FeishuTenantInfoResponse;
 
 /**
+ * tenant template.
  *
  * @author Shawn Deng
- * @date 2021-07-07 15:27:28
  */
 public class TenantTemplate extends AbstractFeishuOperations implements TenantOperations {
 
@@ -19,6 +19,8 @@ public class TenantTemplate extends AbstractFeishuOperations implements TenantOp
 
     @Override
     public FeishuTenantInfoResponse getTenantInfo(String tenantKey) {
-        return getFeishuTemplate().doGet(buildUri(V2_TENANT_QUERY_URL), createAuthHeaders(getFeishuTemplate().getTenantAccessToken(tenantKey, false)), FeishuTenantInfoResponse.class);
+        return getFeishuTemplate().doGet(buildUri(V2_TENANT_QUERY_URL),
+            createAuthHeaders(getFeishuTemplate().getTenantAccessToken(tenantKey, false)),
+            FeishuTenantInfoResponse.class);
     }
 }

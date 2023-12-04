@@ -8,7 +8,6 @@ import lombok.ToString;
  * user with name
  *
  * @author Shawn Deng
- * @date 2020-11-26 23:35:14
  */
 @Setter
 @Getter

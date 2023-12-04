@@ -5,8 +5,8 @@ import com.vikadata.social.feishu.model.FeishuAccessToken;
 import com.vikadata.social.feishu.model.FeishuUserAuthInfo;
 
 /**
+ * feishu auth operations.
  * @author Shawn Deng
- * @date 2020-11-26 01:15:06
  */
 public interface AuthOperations {
 

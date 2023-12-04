@@ -6,8 +6,9 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
+ * Base page info.
+ *
  * @author Shawn Deng
- * @date 2020-11-18 16:50:00
  */
 @Setter
 @Getter

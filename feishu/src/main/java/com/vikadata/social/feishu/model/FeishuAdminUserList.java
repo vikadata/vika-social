@@ -8,8 +8,9 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
+ * Feishu admin user list.
+ *
  * @author Shawn Deng
- * @date 2020-12-03 00:04:46
  */
 @Setter
 @Getter

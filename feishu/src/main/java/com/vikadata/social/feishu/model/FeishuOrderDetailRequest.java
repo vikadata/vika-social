@@ -5,10 +5,9 @@ import lombok.Setter;
 
 /**
  * <p>
- *
+ * feishu order detail request.
  * </p>
  * @author zoe zheng
- * @date 2021/12/28 4:57 PM
  */
 @Setter
 @Getter

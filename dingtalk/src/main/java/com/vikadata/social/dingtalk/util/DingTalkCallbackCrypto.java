@@ -18,8 +18,8 @@ import com.vikadata.social.dingtalk.exception.DingTalkEncryptException;
 
 
 /**
- *  DingTalk Open Platform Encryption and Decryption Method
- *  Cut & paste from open-dingtalk/dingtalk-callback-Crypto
+ * DingTalk Open Platform Encryption and Decryption Method
+ * Cut and paste from open-dingtalk or dingtalk-callback-Crypto
  */
 public class DingTalkCallbackCrypto {
 
@@ -52,10 +52,10 @@ public class DingTalkCallbackCrypto {
      * @param corpId         Enterprise self-built application - event subscription, using appKey,
      *                       Enterprise self-built application - register callback address, use customKey,
      *                       Third-party enterprise applications, using suiteKey
-     *
      * @throws DingTalkEncryptException Execution failed, please check the exception error code and specific error message
      */
-    public DingTalkCallbackCrypto(String token, String encodingAesKey, String corpId) throws DingTalkEncryptException {
+    public DingTalkCallbackCrypto(String token, String encodingAesKey, String corpId)
+        throws DingTalkEncryptException {
         if (null == encodingAesKey || encodingAesKey.length() != AES_ENCODE_KEY_LENGTH) {
             throw new DingTalkEncryptException(DingTalkEncryptException.AES_KEY_ILLEGAL);
         }
@@ -77,16 +77,18 @@ public class DingTalkCallbackCrypto {
      * @param plaintext The message body passed in plaintext
      * @param timeStamp timestamp millisecond
      * @param nonce     random string
-     * @return Map<String, String>
+     * @return encrypted Map
      * @throws DingTalkEncryptException DingTalk encryption exception
      */
     public Map<String, String> getEncryptedMap(String plaintext, Long timeStamp, String nonce)
-            throws DingTalkEncryptException {
+        throws DingTalkEncryptException {
         if (null == plaintext) {
-            throw new DingTalkEncryptException(DingTalkEncryptException.ENCRYPTION_PLAINTEXT_ILLEGAL);
+            throw new DingTalkEncryptException(
+                DingTalkEncryptException.ENCRYPTION_PLAINTEXT_ILLEGAL);
         }
         if (null == timeStamp) {
-            throw new DingTalkEncryptException(DingTalkEncryptException.ENCRYPTION_TIMESTAMP_ILLEGAL);
+            throw new DingTalkEncryptException(
+                DingTalkEncryptException.ENCRYPTION_TIMESTAMP_ILLEGAL);
         }
         if (null == nonce || nonce.length() != 16) {
             throw new DingTalkEncryptException(DingTalkEncryptException.ENCRYPTION_NONCE_ILLEGAL);
@@ -112,8 +114,9 @@ public class DingTalkCallbackCrypto {
      * @return Decrypted original text
      * @throws DingTalkEncryptException DingTalk encryption exception
      */
-    public String getDecryptMsg(String msgSignature, String timeStamp, String nonce, String encryptMsg)
-            throws DingTalkEncryptException {
+    public String getDecryptMsg(String msgSignature, String timeStamp, String nonce,
+                                String encryptMsg)
+        throws DingTalkEncryptException {
         // check signature
         String signature = getSignature(token, timeStamp, nonce, encryptMsg);
         if (!signature.equals(msgSignature)) {
@@ -125,7 +128,7 @@ public class DingTalkCallbackCrypto {
     /**
      * Encrypt plaintext
      *
-     * @param random Encrypted random string
+     * @param random    Encrypted random string
      * @param plaintext Plaintext to be encrypted
      * @return Encrypted base 64 encoded string
      */
@@ -150,8 +153,7 @@ public class DingTalkCallbackCrypto {
             cipher.init(Cipher.ENCRYPT_MODE, keySpec, iv);
             byte[] encrypted = cipher.doFinal(unencrypted);
             return Base64.getEncoder().encodeToString(encrypted);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new DingTalkEncryptException(DingTalkEncryptException.COMPUTE_ENCRYPT_TEXT_ERROR);
         }
     }
@@ -173,8 +175,7 @@ public class DingTalkCallbackCrypto {
             byte[] encrypted = Base64.getDecoder().decode(text);
             // decrypt
             originalArr = cipher.doFinal(encrypted);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new DingTalkEncryptException(DingTalkEncryptException.COMPUTE_DECRYPT_TEXT_ERROR);
         }
 
@@ -186,16 +187,19 @@ public class DingTalkCallbackCrypto {
             // Separate 16-bit random string, network byte order and corpId
             byte[] networkOrder = Arrays.copyOfRange(bytes, 16, 20);
             int plainTextLegth = Utils.bytes2int(networkOrder);
-            plainText = new String(Arrays.copyOfRange(bytes, 20, 20 + plainTextLegth), StandardCharsets.UTF_8);
-            fromCorpid = new String(Arrays.copyOfRange(bytes, 20 + plainTextLegth, bytes.length), StandardCharsets.UTF_8);
-        }
-        catch (Exception e) {
-            throw new DingTalkEncryptException(DingTalkEncryptException.COMPUTE_DECRYPT_TEXT_LENGTH_ERROR);
+            plainText = new String(Arrays.copyOfRange(bytes, 20, 20 + plainTextLegth),
+                StandardCharsets.UTF_8);
+            fromCorpid = new String(Arrays.copyOfRange(bytes, 20 + plainTextLegth, bytes.length),
+                StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new DingTalkEncryptException(
+                DingTalkEncryptException.COMPUTE_DECRYPT_TEXT_LENGTH_ERROR);
         }
 
         // Cases where the corpids are not the same
         if (!fromCorpid.equals(corpId)) {
-            throw new DingTalkEncryptException(DingTalkEncryptException.COMPUTE_DECRYPT_TEXT_CORPID_ERROR);
+            throw new DingTalkEncryptException(
+                DingTalkEncryptException.COMPUTE_DECRYPT_TEXT_CORPID_ERROR);
         }
         return plainText;
     }
@@ -203,17 +207,17 @@ public class DingTalkCallbackCrypto {
     /**
      * digital signature
      *
-     * @param token        isv token
-     * @param timestamp    timestamp millisecond
-     * @param nonce        random string
-     * @param encrypt      encrypted text
+     * @param token     isv token
+     * @param timestamp timestamp millisecond
+     * @param nonce     random string
+     * @param encrypt   encrypted text
      * @return String
      * @throws DingTalkEncryptException DingTalk encryption exception
      */
     public String getSignature(String token, String timestamp, String nonce, String encrypt)
-            throws DingTalkEncryptException {
+        throws DingTalkEncryptException {
         try {
-            String[] array = new String[] { token, timestamp, nonce, encrypt };
+            String[] array = new String[] {token, timestamp, nonce, encrypt};
             Arrays.sort(array);
             StringBuffer sb = new StringBuffer();
             for (int i = 0; i < 4; i++) {
@@ -234,8 +238,7 @@ public class DingTalkCallbackCrypto {
                 hexstr.append(shaHex);
             }
             return hexstr.toString();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new DingTalkEncryptException(DingTalkEncryptException.COMPUTE_SIGNATURE_ERROR);
         }
     }
@@ -258,8 +261,9 @@ public class DingTalkCallbackCrypto {
         }
 
         public static byte[] int2Bytes(int count) {
-            byte[] byteArr = new byte[] { (byte) (count >> 24 & 255), (byte) (count >> 16 & 255), (byte) (count >> 8 & 255),
-                    (byte) (count & 255) };
+            byte[] byteArr = new byte[] {(byte) (count >> 24 & 255), (byte) (count >> 16 & 255),
+                (byte) (count >> 8 & 255),
+                (byte) (count & 255)};
             return byteArr;
         }
 

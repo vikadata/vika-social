@@ -42,7 +42,6 @@ public abstract class AbstractWeComTemplate {
 
     private final static String TEMP_CONFIG_KEY = "work_weixin:temp_config:";
 
-    @Autowired(required = false)
     private StringRedisTemplate stringRedisTemplate;
 
     private final RestTemplate restTemplate;
@@ -53,14 +52,18 @@ public abstract class AbstractWeComTemplate {
     protected static Map<String, WxCpService> cpServices = Maps.newConcurrentMap();
 
     // key：corpId + agentId , cache temporarily authorized services, the default timeout is 2 hours
-    protected static TimedCache<String, WxCpService> cpServicesByTempAuth = CacheUtil.newTimedCache(Duration.ofHours(2).toMillis());
+    protected static TimedCache<String, WxCpService> cpServicesByTempAuth =
+        CacheUtil.newTimedCache(Duration.ofHours(2).toMillis());
 
-    public AbstractWeComTemplate() {
+    public AbstractWeComTemplate(WeComConfig weComConfig, StringRedisTemplate stringRedisTemplate) {
+        this.weComConfig = weComConfig;
+        this.stringRedisTemplate = stringRedisTemplate;
         this.restTemplate = createRestTemplate();
     }
 
     /**
      * Abstract Service that opens API
+     *
      * @return WxCpService
      */
     public abstract WxCpService openService();
@@ -72,6 +75,8 @@ public abstract class AbstractWeComTemplate {
 
     /**
      * Get the basic public configuration of WeCom
+     *
+     * @return WeComConfig
      */
     public WeComConfig getConfig() {
         return weComConfig;
@@ -79,6 +84,10 @@ public abstract class AbstractWeComTemplate {
 
     /**
      * merge key
+     *
+     * @param corpId  corp id
+     * @param agentId agent id
+     * @return key
      */
     public String mergeKey(String corpId, Integer agentId) {
         return String.format("%s-%s", corpId, agentId);
@@ -86,6 +95,8 @@ public abstract class AbstractWeComTemplate {
 
     /**
      * Get cache configuration file prefix
+     *
+     * @return cache configuration file prefix
      */
     public String getCacheConfigKeyPrefix() {
         return getCacheConfigKeyPrefix(false);
@@ -93,17 +104,22 @@ public abstract class AbstractWeComTemplate {
 
     /**
      * Get cache configuration file prefix
+     *
      * @param isTemp Is temporary
+     * @return cache configuration file prefix
      */
     public String getCacheConfigKeyPrefix(boolean isTemp) {
-        String prefix = StrUtil.isBlank(weComConfig.getKeyPrefix()) ? "" : StrUtil.appendIfMissing(weComConfig.getKeyPrefix(), ":");
+        String prefix = StrUtil.isBlank(weComConfig.getKeyPrefix()) ? "" :
+            StrUtil.appendIfMissing(weComConfig.getKeyPrefix(), ":");
         return prefix + (isTemp ? TEMP_CONFIG_KEY : CONFIG_KEY);
     }
 
     /**
      * Query whether the current cache service
      * Unable to query temporary authorization service
-     * @param key  cache key
+     *
+     * @param key cache key
+     * @return true: exist false: not exist
      */
     public boolean isExistService(String key) {
         return isExistService(key, false);
@@ -111,8 +127,10 @@ public abstract class AbstractWeComTemplate {
 
     /**
      * Query whether the current cache service
+     *
      * @param key               cache key
      * @param isTempAuthService Query temporary services
+     * @return true: exist false: not exist
      */
     public boolean isExistService(String key, boolean isTempAuthService) {
         if (isTempAuthService) {
@@ -123,9 +141,11 @@ public abstract class AbstractWeComTemplate {
 
     /**
      * Dynamically add enterprise WeCom service class
-     * @param corpId corp Id
-     * @param agentId agent id
+     *
+     * @param corpId      corp Id
+     * @param agentId     agent id
      * @param agentSecret agent secret key
+     * @return WxCpService
      */
     public WxCpService addService(String corpId, Integer agentId, String agentSecret) {
         return addService(corpId, agentId, agentSecret, false, -1);
@@ -134,13 +154,15 @@ public abstract class AbstractWeComTemplate {
     /**
      * Dynamically add enterprise WeCom service class
      *
-     * @param corpId            corp Id
+     * @param corpId            corp id
      * @param agentId           agent id
      * @param agentSecret       agent secret key
      * @param isTempAuthService Is it temporarily authorized
      * @param timeout           Temporary authorization timeout
+     * @return WxCpService
      */
-    public WxCpService addService(String corpId, Integer agentId, String agentSecret, boolean isTempAuthService, long timeout) {
+    public WxCpService addService(String corpId, Integer agentId, String agentSecret,
+                                  boolean isTempAuthService, long timeout) {
         WxCpService service;
         String key = this.mergeKey(corpId, agentId);
         if (!isTempAuthService) {
@@ -154,11 +176,12 @@ public abstract class AbstractWeComTemplate {
                     break;
                 }
                 default:
-                    throw new IllegalStateException("Construct enterprise WeCom service[" + weComConfig.getStorageType() + "] policy does not exist.");
+                    throw new IllegalStateException(
+                        "Construct enterprise WeCom service[" + weComConfig.getStorageType() +
+                            "] policy does not exist.");
             }
             cpServices.put(key, service);
-        }
-        else {
+        } else {
             // The temporary authorization service cannot use Redis mode and automatically switches to in-memory build mode
             service = this.memoryBulid(corpId, agentId, agentSecret);
             cpServicesByTempAuth.put(key, service, timeout);
@@ -182,17 +205,24 @@ public abstract class AbstractWeComTemplate {
     }
 
     /**
-     * Use Redis to build Service
+     * Use Redis to build Service.
+     *
+     * @param corpId      corp id
+     * @param agentId     agent id
+     * @param agentSecret agent secret key
+     * @return WxCpService
      */
     private WxCpService redisBulid(String corpId, Integer agentId, String agentSecret) {
         WxCpService service = new WxCpServiceImpl();
         if (null == stringRedisTemplate) {
-            throw new RuntimeException("Construction failed: Currently unable to get Redis connection, you can try to "
+            throw new RuntimeException(
+                "Construction failed: Currently unable to get Redis connection, you can try to "
                     + "use: Memory mode.");
         }
         WxRedisOps redisOps = new RedisTemplateWxRedisOps(stringRedisTemplate);
 
-        WeComRedisConfigImpl configStorage = new WeComRedisConfigImpl(redisOps, weComConfig.getKeyPrefix());
+        WeComRedisConfigImpl configStorage =
+            new WeComRedisConfigImpl(redisOps, weComConfig.getKeyPrefix());
         configStorage.setCorpId(corpId);
         configStorage.setAgentId(agentId);
         configStorage.setCorpSecret(agentSecret);
@@ -202,6 +232,8 @@ public abstract class AbstractWeComTemplate {
 
     /**
      * Remove temporary authorization service
+     *
+     * @param key key
      */
     public void removeCpServicesByTempAuth(String key) {
         cpServicesByTempAuth.remove(key);
@@ -217,7 +249,9 @@ public abstract class AbstractWeComTemplate {
     }
 
     /**
-     * get RestTemplate
+     * get RestTemplate.
+     *
+     * @return RestTemplate
      */
     protected RestTemplate getRestTemplate() {
         return restTemplate;
@@ -225,22 +259,24 @@ public abstract class AbstractWeComTemplate {
 
     /**
      * https request factory
+     * @return HttpComponentsClientHttpRequestFactory
      */
     public HttpComponentsClientHttpRequestFactory generateHttpsRequestFactory() {
         try {
             TrustStrategy acceptingTrustStrategy = (x509Certificates, authType) -> true;
-            SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
+            SSLContext sslContext =
+                SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
             SSLConnectionSocketFactory connectionSocketFactory =
-                    new SSLConnectionSocketFactory(sslContext, new NoopHostnameVerifier());
+                new SSLConnectionSocketFactory(sslContext, new NoopHostnameVerifier());
 
             HttpClientBuilder httpClientBuilder = HttpClients.custom();
             httpClientBuilder.setSSLSocketFactory(connectionSocketFactory);
             CloseableHttpClient httpClient = httpClientBuilder.build();
-            HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+            HttpComponentsClientHttpRequestFactory factory =
+                new HttpComponentsClientHttpRequestFactory();
             factory.setHttpClient(httpClient);
             return factory;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException("create connection error", e);
         }
     }

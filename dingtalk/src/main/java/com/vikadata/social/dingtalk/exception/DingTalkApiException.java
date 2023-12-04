@@ -10,7 +10,6 @@ import static com.vikadata.social.dingtalk.exception.DingTalkExceptionConstants.
  * api exception
  *
  * @author Zoe Zheng
- * @date 2021-04-06 18:30:09
  */
 public class DingTalkApiException extends RuntimeException {
 

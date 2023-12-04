@@ -84,14 +84,16 @@ public abstract class AbstractDingTalkOperations extends AbstractOperations {
         this.dingtalkConfig = dingtalkConfig;
     }
 
-    public AbstractDingTalkOperations(RestTemplate restTemplate, DingtalkConfig dingtalkConfig, ConfigStorage configStorage) {
+    public AbstractDingTalkOperations(RestTemplate restTemplate, DingtalkConfig dingtalkConfig,
+                                      ConfigStorage configStorage) {
         super(restTemplate);
         this.configStorage = configStorage;
         this.dingtalkConfig = dingtalkConfig;
     }
 
     public AbstractDingTalkOperations(RestTemplate restTemplate, DingtalkConfig dingtalkConfig,
-            ConfigStorage configStorage, HashMap<String, AppTicketStorage> suiteTicketStorage) {
+                                      ConfigStorage configStorage,
+                                      HashMap<String, AppTicketStorage> suiteTicketStorage) {
         super(restTemplate);
         this.configStorage = configStorage;
         this.dingtalkConfig = dingtalkConfig;
@@ -106,7 +108,8 @@ public abstract class AbstractDingTalkOperations extends AbstractOperations {
         return StrUtil.concat(false, API_V1_URL_BASE, resourceUrl);
     }
 
-    protected <T extends BaseResponse> T doGet(String url, Map<String, String> headers, Class<T> responseClass) throws DingTalkApiException {
+    protected <T extends BaseResponse> T doGet(String url, Map<String, String> headers,
+                                               Class<T> responseClass) throws DingTalkApiException {
         try {
             HttpHeaders header = null;
             if (headers != null && !headers.isEmpty()) {
@@ -114,15 +117,17 @@ public abstract class AbstractDingTalkOperations extends AbstractOperations {
                 headers.forEach(header::add);
             }
             HttpEntity<Void> request = new HttpEntity<>(header);
-            ResponseEntity<T> response = restTemplate.exchange(url, HttpMethod.GET, request, responseClass);
+            ResponseEntity<T> response =
+                restTemplate.exchange(url, HttpMethod.GET, request, responseClass);
             return handleResponse(response);
-        }
-        catch (RestClientException e) {
+        } catch (RestClientException e) {
             throw new DingTalkApiException(e.getMessage());
         }
     }
 
-    protected <T extends BaseResponse> T doPost(String url, Map<String, String> headers, Object requestBody, Class<T> responseClass) throws DingTalkApiException {
+    protected <T extends BaseResponse> T doPost(String url, Map<String, String> headers,
+                                                Object requestBody, Class<T> responseClass)
+        throws DingTalkApiException {
         try {
             HttpHeaders header = new HttpHeaders();
             if (headers != null && !headers.isEmpty()) {
@@ -133,18 +138,19 @@ public abstract class AbstractDingTalkOperations extends AbstractOperations {
                 header.setContentType(MediaType.APPLICATION_JSON);
             }
             HttpEntity<Object> entity = new HttpEntity<>(requestBody, header);
-            ResponseEntity<T> response = restTemplate.postForEntity(URI.create(url), entity, responseClass);
+            ResponseEntity<T> response =
+                restTemplate.postForEntity(URI.create(url), entity, responseClass);
             return handleResponse(response);
-        }
-        catch (RestClientException e) {
+        } catch (RestClientException e) {
             throw new DingTalkApiException(e.getMessage());
         }
     }
 
     /**
      * get the access token of the internal application
-     * @param appKey The unique identification key of the application
-     * @param appSecret Application secret key value
+     *
+     * @param appKey       The unique identification key of the application
+     * @param appSecret    Application secret key value
      * @param forceRefresh Whether to force refresh
      * @return access_token
      */
@@ -165,18 +171,17 @@ public abstract class AbstractDingTalkOperations extends AbstractOperations {
             map.put("appkey", appKey);
             map.put("appsecret", appSecret);
             String fullUrl = buildUrlWithQueryStr(buildUri(GET_APP_ACCESS_TOKEN),
-                    DingTalkSignatureUtil.paramToQueryString(map));
-            DingTalkAppAccessTokenResponse response = doGet(fullUrl, new HashMap<>(), DingTalkAppAccessTokenResponse.class);
-            configStorage.updateTenantAccessToken(appKey, response.getAccessToken(), response.getExpiresIn());
+                DingTalkSignatureUtil.paramToQueryString(map));
+            DingTalkAppAccessTokenResponse response =
+                doGet(fullUrl, new HashMap<>(), DingTalkAppAccessTokenResponse.class);
+            configStorage.updateTenantAccessToken(appKey, response.getAccessToken(),
+                response.getExpiresIn());
             return response.getAccessToken();
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        }
-        catch (DingTalkApiException e) {
+        } catch (DingTalkApiException e) {
             throw new IllegalStateException(e);
-        }
-        finally {
+        } finally {
             if (locked) {
                 lock.unlock();
             }
@@ -186,10 +191,13 @@ public abstract class AbstractDingTalkOperations extends AbstractOperations {
     /**
      * get the access token of the isv application of the auth
      *
+     * @param request      DingTalkSignature
+     * @param authCorpId   auth corp id
      * @param forceRefresh Whether to force refresh
      * @return String
      */
-    protected String getCorpAppAccessToken(DingTalkSignature request, String authCorpId, boolean forceRefresh) {
+    protected String getCorpAppAccessToken(DingTalkSignature request, String authCorpId,
+                                           boolean forceRefresh) {
         String key = String.format(AUTH_CORP_ACCESS_TOKEN_KEY, authCorpId, request.getAccessKey());
         if (!configStorage.isTenantAccessTokenExpired(key) && !forceRefresh) {
             return configStorage.getTenantAccessToken(key);
@@ -204,20 +212,19 @@ public abstract class AbstractDingTalkOperations extends AbstractOperations {
                 }
             } while (!locked);
             String fullUrl = buildSignatureUrl(GET_CORP_APP_ACCESS_TOKEN, request.getAccessKey(),
-                    request.getAppSecret(), request.getSuiteTicket());
+                request.getAppSecret(), request.getSuiteTicket());
             DingTalkCorpAccessTokenRequest body = new DingTalkCorpAccessTokenRequest();
             body.setAuthCorpid(authCorpId);
-            DingTalkAppAccessTokenResponse response = doPost(fullUrl, new HashMap<>(), body, DingTalkAppAccessTokenResponse.class);
-            configStorage.updateTenantAccessToken(key, response.getAccessToken(), response.getExpiresIn());
+            DingTalkAppAccessTokenResponse response =
+                doPost(fullUrl, new HashMap<>(), body, DingTalkAppAccessTokenResponse.class);
+            configStorage.updateTenantAccessToken(key, response.getAccessToken(),
+                response.getExpiresIn());
             return response.getAccessToken();
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        }
-        catch (DingTalkApiException e) {
+        } catch (DingTalkApiException e) {
             throw new IllegalStateException(e);
-        }
-        finally {
+        } finally {
             if (locked) {
                 lock.unlock();
             }
@@ -227,10 +234,12 @@ public abstract class AbstractDingTalkOperations extends AbstractOperations {
     /**
      * get isv app access_token
      *
+     * @param request      DingTalk Suite Access Token Request
      * @param forceRefresh Whether to force refresh
      * @return String
      */
-    protected String getIsvSuiteAccessToken(DingTalkSuiteAccessTokenRequest request, boolean forceRefresh) {
+    protected String getIsvSuiteAccessToken(DingTalkSuiteAccessTokenRequest request,
+                                            boolean forceRefresh) {
         String suiteKey = request.getSuiteKey();
         if (!configStorage.isTenantAccessTokenExpired(suiteKey) && !forceRefresh) {
             return configStorage.getTenantAccessToken(suiteKey);
@@ -244,25 +253,25 @@ public abstract class AbstractDingTalkOperations extends AbstractOperations {
                     return configStorage.getTenantAccessToken(suiteKey);
                 }
             } while (!locked);
-            DingTalkSuiteAccessTokenResponse response = doPost(buildUri(GET_ISV_SUITE_ACCESS_TOKEN), new HashMap<>(),
+            DingTalkSuiteAccessTokenResponse response =
+                doPost(buildUri(GET_ISV_SUITE_ACCESS_TOKEN), new HashMap<>(),
                     request, DingTalkSuiteAccessTokenResponse.class);
-            configStorage.updateTenantAccessToken(suiteKey, response.getSuiteAccessToken(), response.getExpiresIn());
+            configStorage.updateTenantAccessToken(suiteKey, response.getSuiteAccessToken(),
+                response.getExpiresIn());
             return response.getSuiteAccessToken();
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        }
-        catch (DingTalkApiException e) {
+        } catch (DingTalkApiException e) {
             throw new IllegalStateException(e);
-        }
-        finally {
+        } finally {
             if (locked) {
                 lock.unlock();
             }
         }
     }
 
-    protected String getIsvJsApiTicket(String suiteKey, String authCorpId, String accessToken, Boolean forceRefresh) {
+    protected String getIsvJsApiTicket(String suiteKey, String authCorpId, String accessToken,
+                                       Boolean forceRefresh) {
         String key = String.format(JS_API_TICKET_ACCESS_TOKEN_KEY_TPL, authCorpId, suiteKey);
         if (!configStorage.isTenantAccessTokenExpired(key) && !forceRefresh) {
             return configStorage.getTenantAccessToken(key);
@@ -279,17 +288,16 @@ public abstract class AbstractDingTalkOperations extends AbstractOperations {
             String fullUrl = buildAccessTokenUrl(GET_JS_API_TICKET, accessToken);
             DingTalkCorpAccessTokenRequest body = new DingTalkCorpAccessTokenRequest();
             body.setAuthCorpid(authCorpId);
-            DingTalkAppJsApiTicketResponse response = doGet(fullUrl, new HashMap<>(), DingTalkAppJsApiTicketResponse.class);
-            configStorage.updateTenantAccessToken(key, response.getTicket(), response.getExpiresIn());
+            DingTalkAppJsApiTicketResponse response =
+                doGet(fullUrl, new HashMap<>(), DingTalkAppJsApiTicketResponse.class);
+            configStorage.updateTenantAccessToken(key, response.getTicket(),
+                response.getExpiresIn());
             return response.getTicket();
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        }
-        catch (DingTalkApiException e) {
+        } catch (DingTalkApiException e) {
             throw new IllegalStateException(e);
-        }
-        finally {
+        } finally {
             if (locked) {
                 lock.unlock();
             }
@@ -299,7 +307,8 @@ public abstract class AbstractDingTalkOperations extends AbstractOperations {
 
     /**
      * get the access token of the authorized corporate
-     * @param agentId Enterprise internal authorization application agent Id
+     *
+     * @param agentId      Enterprise internal authorization application agent Id
      * @param forceRefresh Whether to force refresh
      * @return String
      */
@@ -314,9 +323,10 @@ public abstract class AbstractDingTalkOperations extends AbstractOperations {
 
     /**
      * get isv app access_token
-     * @param suiteId suite id
+     *
+     * @param suiteId      suite id
      * @param forceRefresh Whether to force refresh
-     * @param authCorpId The corpid of the authorized enterprise
+     * @param authCorpId   The corpid of the authorized enterprise
      * @return access_token
      */
     protected String getIsvAppAccessToken(String suiteId, String authCorpId, boolean forceRefresh) {
@@ -336,7 +346,8 @@ public abstract class AbstractDingTalkOperations extends AbstractOperations {
      * get basic information about authorized apps,
      * get enterprise authorization information,
      * activate the app
-     * @param suiteId suite id
+     *
+     * @param suiteId      suite id
      * @param forceRefresh Whether to force refresh
      * @return access_token
      */
@@ -351,7 +362,8 @@ public abstract class AbstractDingTalkOperations extends AbstractOperations {
 
     /**
      * Get the access token of the micro-app admin background without logging in
-     * @param corpId isv corporate id
+     *
+     * @param corpId     isv corporate id
      * @param corpSecret the isv sso secret
      * @return access_token
      */
@@ -360,15 +372,16 @@ public abstract class AbstractDingTalkOperations extends AbstractOperations {
         map.put("corpid", corpId);
         map.put("corpsecret", corpSecret);
         String fullUrl = buildUrlWithQueryStr(buildUri(GET_SSO_ACCESS_TOKEN),
-                DingTalkSignatureUtil.paramToQueryString(map));
-        DingTalkSsoAccessTokenResponse response = doGet(fullUrl, new HashMap<>(), DingTalkSsoAccessTokenResponse.class);
+            DingTalkSignatureUtil.paramToQueryString(map));
+        DingTalkSsoAccessTokenResponse response =
+            doGet(fullUrl, new HashMap<>(), DingTalkSsoAccessTokenResponse.class);
         return response.getAccessToken();
     }
 
     /**
      * get full url
      *
-     * @param url dingtalk api url
+     * @param url      dingtalk api url
      * @param queryStr The processed parameter string
      * @return full request url
      */
@@ -376,8 +389,7 @@ public abstract class AbstractDingTalkOperations extends AbstractOperations {
         String fullUrl;
         if (url.indexOf("?") > 0) {
             fullUrl = url + "&" + queryStr;
-        }
-        else {
+        } else {
             fullUrl = url + "?" + queryStr;
         }
         return fullUrl;
@@ -387,9 +399,11 @@ public abstract class AbstractDingTalkOperations extends AbstractOperations {
         return buildSignatureUrl(resourceUrl, accessKey, appSecret, null);
     }
 
-    protected String buildSignatureUrl(String resourceUrl, String accessKey, String appSecret, String suiteTicket) {
+    protected String buildSignatureUrl(String resourceUrl, String accessKey, String appSecret,
+                                       String suiteTicket) {
         Long timestamp = System.currentTimeMillis();
-        String canonicalString = DingTalkSignatureUtil.getCanonicalStringForIsv(timestamp, suiteTicket);
+        String canonicalString =
+            DingTalkSignatureUtil.getCanonicalStringForIsv(timestamp, suiteTicket);
         String signature = DingTalkSignatureUtil.computeSignature(appSecret, canonicalString);
         Map<String, String> ps = new HashMap<>();
         ps.put("accessKey", accessKey);
@@ -420,31 +434,35 @@ public abstract class AbstractDingTalkOperations extends AbstractOperations {
 
         /**
          * do whatever you want
+         *
          * @return T
-         * @throws DingTalkApiException
+         * @throws DingTalkApiException if any error occurs
          */
         T doExecute() throws DingTalkApiException;
     }
 
-    private <T extends BaseResponse> T handleResponse(ResponseEntity<T> responseEntity) throws DingTalkApiException {
+    private <T extends BaseResponse> T handleResponse(ResponseEntity<T> responseEntity)
+        throws DingTalkApiException {
         if (responseEntity == null) {
             throw new DingTalkApiException("response message can not be null");
         }
         if (!responseEntity.getStatusCode().is2xxSuccessful()) {
             if (responseEntity.getBody() != null) {
-                throw new DingTalkApiException(responseEntity.getBody().getErrcode(), responseEntity.getBody().getErrmsg());
-            }
-            else {
-                throw new DingTalkApiException("Failed to request DingTalk server, please check network or parameters");
+                throw new DingTalkApiException(responseEntity.getBody().getErrcode(),
+                    responseEntity.getBody().getErrmsg());
+            } else {
+                throw new DingTalkApiException(
+                    "Failed to request DingTalk server, please check network or parameters");
             }
         }
         if (responseEntity.getBody() != null) {
             if (responseEntity.getBody().getErrcode() != 0) {
                 if (responseEntity.getBody().getSubCode() != null) {
                     throw new DingTalkApiException(responseEntity.getBody().getSubCode(),
-                            responseEntity.getBody().getSubMsg());
+                        responseEntity.getBody().getSubMsg());
                 }
-                throw new DingTalkApiException(responseEntity.getBody().getErrcode(), responseEntity.getBody().getErrmsg());
+                throw new DingTalkApiException(responseEntity.getBody().getErrcode(),
+                    responseEntity.getBody().getErrmsg());
             }
         }
         return responseEntity.getBody();

@@ -6,8 +6,9 @@ import com.vikadata.social.feishu.exception.FeishuApiException;
 import com.vikadata.social.feishu.model.FeishuContactScopeResponse;
 
 /**
+ * contact template.
+ *
  * @author Shawn Deng
- * @date 2020-12-01 11:49:54
  */
 public class ContactTemplate extends AbstractFeishuOperations implements ContactOperations {
 
@@ -19,6 +20,8 @@ public class ContactTemplate extends AbstractFeishuOperations implements Contact
 
     @Override
     public FeishuContactScopeResponse getContactScope(String tenantKey) throws FeishuApiException {
-        return getFeishuTemplate().doGet(buildUri(CONTACT_SCOPE_URL), createAuthHeaders(getFeishuTemplate().getTenantAccessToken(tenantKey, false)), FeishuContactScopeResponse.class);
+        return getFeishuTemplate().doGet(buildUri(CONTACT_SCOPE_URL),
+            createAuthHeaders(getFeishuTemplate().getTenantAccessToken(tenantKey, false)),
+            FeishuContactScopeResponse.class);
     }
 }

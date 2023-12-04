@@ -13,7 +13,7 @@ import lombok.ToString;
 public class DingTalkDeptListParentByUserRequest {
 
     /**
-     * userid of the user to query。
+     * userid of the user to query.
      */
     private String userid;
 }

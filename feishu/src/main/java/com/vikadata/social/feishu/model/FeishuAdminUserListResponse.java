@@ -5,8 +5,9 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
+ * Feishu admin user list response.
+ *
  * @author Shawn Deng
- * @date 2020-12-03 00:01:08
  */
 @Setter
 @Getter

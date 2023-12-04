@@ -8,6 +8,7 @@ dependencies {
   api(project(':common'))
   api(rootProject.ext.dependencies['wx-cp'])
   
+  implementation rootProject.ext.dependencies['okhttp3']
   implementation rootProject.ext.dependencies['jackson']
   implementation rootProject.ext.dependencies['slf4j']
   implementation rootProject.ext.dependencies['hutool']

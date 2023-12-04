@@ -3,8 +3,6 @@ package com.vikadata.social.wecom;
 import java.time.Duration;
 import java.util.Map;
 
-import javax.net.ssl.SSLContext;
-
 import cn.hutool.cache.CacheUtil;
 import cn.hutool.cache.impl.TimedCache;
 import cn.hutool.core.util.StrUtil;
@@ -14,21 +12,13 @@ import me.chanjar.weixin.common.redis.WxRedisOps;
 import me.chanjar.weixin.cp.api.WxCpService;
 import me.chanjar.weixin.cp.api.impl.WxCpServiceImpl;
 import me.chanjar.weixin.cp.config.impl.WxCpDefaultConfigImpl;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContexts;
-import org.apache.http.ssl.TrustStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vikadata.social.wecom.config.WeComRedisConfigImpl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -42,7 +32,7 @@ public abstract class AbstractWeComTemplate {
 
     private final static String TEMP_CONFIG_KEY = "work_weixin:temp_config:";
 
-    private StringRedisTemplate stringRedisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
 
     private final RestTemplate restTemplate;
 
@@ -244,7 +234,7 @@ public abstract class AbstractWeComTemplate {
      */
     private RestTemplate createRestTemplate() {
         RestTemplate client = new RestTemplate();
-        client.setRequestFactory(generateHttpsRequestFactory());
+        client.setRequestFactory(new OkHttp3ClientHttpRequestFactory());
         return client;
     }
 
@@ -256,29 +246,4 @@ public abstract class AbstractWeComTemplate {
     protected RestTemplate getRestTemplate() {
         return restTemplate;
     }
-
-    /**
-     * https request factory
-     * @return HttpComponentsClientHttpRequestFactory
-     */
-    public HttpComponentsClientHttpRequestFactory generateHttpsRequestFactory() {
-        try {
-            TrustStrategy acceptingTrustStrategy = (x509Certificates, authType) -> true;
-            SSLContext sslContext =
-                SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
-            SSLConnectionSocketFactory connectionSocketFactory =
-                new SSLConnectionSocketFactory(sslContext, new NoopHostnameVerifier());
-
-            HttpClientBuilder httpClientBuilder = HttpClients.custom();
-            httpClientBuilder.setSSLSocketFactory(connectionSocketFactory);
-            CloseableHttpClient httpClient = httpClientBuilder.build();
-            HttpComponentsClientHttpRequestFactory factory =
-                new HttpComponentsClientHttpRequestFactory();
-            factory.setHttpClient(httpClient);
-            return factory;
-        } catch (Exception e) {
-            throw new RuntimeException("create connection error", e);
-        }
-    }
-
 }

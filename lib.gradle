@@ -1,15 +1,14 @@
 ext {
   dependencies = [
-    'spring-web-starter'          : 'org.springframework.boot:spring-boot-starter-web',
-    'spring-web'                  : 'org.springframework:spring-web',
-    'spring-data-redis'           : 'org.springframework.data:spring-data-redis',
-    'lombok'                      : 'org.projectlombok:lombok',
-    'jackson'                     : 'com.fasterxml.jackson.core:jackson-databind',
-    'servlet-api'                 : 'javax.servlet:javax.servlet-api',
+    'spring-web'                  : 'org.springframework:spring-web:5.3.24',
+    'spring-data-redis'           : 'org.springframework.data:spring-data-redis:2.7.6',
+    'lombok'                      : 'org.projectlombok:lombok:1.18.24',
+    'jackson'                     : 'com.fasterxml.jackson.core:jackson-databind:2.13.4.2',
+    'servlet-api'                 : 'javax.servlet:javax.servlet-api:4.0.1',
     'wx-cp'                       : "com.github.binarywang:weixin-java-cp:4.2.0",
     'slf4j'                       : [
-      'org.slf4j:slf4j-api',
-      'ch.qos.logback:logback-classic',
+      'org.slf4j:slf4j-api:1.7.36',
+      'ch.qos.logback:logback-classic:1.2.11',
     ],
     'hutool'                      : [
       "cn.hutool:hutool-core:5.5.9",

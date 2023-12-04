@@ -72,10 +72,6 @@ signing {
   sign publishing.publications.mavenJava
 }
 
-bootJar {
-  enabled = false
-}
-
 jar {
   enabled = true
 }

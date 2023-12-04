@@ -127,7 +127,7 @@ public class WxCpIsvPermitServiceImpl {
     public WxCpIsvPermitBatchGetActiveInfo batchGetActiveInfo(String authCorpId, List<String> activeCodes) throws WxErrorException {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("corpid", authCorpId);
-        JsonArray activeCodeList = new JsonArray(activeCodes.size());
+        JsonArray activeCodeList = new JsonArray();
         activeCodes.forEach(activeCodeList::add);
         jsonObject.add("active_code_list", activeCodeList);
         @SuppressWarnings("deprecation")

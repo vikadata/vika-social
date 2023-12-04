@@ -217,7 +217,7 @@ public class WeComTemplate extends AbstractWeComTemplate implements ApplicationC
             return data.getDomainName();
         }
         catch (RestClientException e) {
-            LOGGER.error("create business domain error：", e);
+            LOGGER.error("create business domain error: ", e);
             throw new WeComApiException("create business domain error");
         }
     }

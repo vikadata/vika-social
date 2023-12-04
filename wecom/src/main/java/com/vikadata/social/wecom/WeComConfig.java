@@ -23,7 +23,7 @@ public class WeComConfig {
 
     private List<InitMenu> initMenus;
 
-    // whether to create a dedicated domain name（default：false）
+    // whether to create a dedicated domain name(default：false)
     private boolean autoCreateDomain = false;
 
     private OperateEnpDdns operateEnpDdns;

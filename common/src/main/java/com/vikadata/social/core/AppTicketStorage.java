@@ -16,7 +16,7 @@ public interface AppTicketStorage {
      * update ticket
      *
      * @param appTicket        ticket pushed by the open platform
-     * @param expiresInSeconds expire seconds （unit：s）
+     * @param expiresInSeconds expire seconds, unit：s
      */
     void updateTicket(String appTicket, int expiresInSeconds);
 }

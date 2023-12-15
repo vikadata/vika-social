@@ -16,7 +16,7 @@ import com.vikadata.social.feishu.constants.FeishuErrorCode;
 import com.vikadata.social.feishu.exception.FeishuApiException;
 import com.vikadata.social.feishu.model.FeishuError;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 
@@ -32,7 +32,7 @@ public class FeishuResponseErrorHandler extends DefaultResponseErrorHandler {
     private final static Logger LOGGER = LoggerFactory.getLogger(FeishuResponseErrorHandler.class);
 
     @Override
-    protected void handleError(ClientHttpResponse response, HttpStatus statusCode) throws IOException {
+    protected void handleError(ClientHttpResponse response, HttpStatusCode statusCode) throws IOException {
         // Status code exists, additional processing does not throw Rest Client Exception
         try {
             ObjectMapper mapper = new ObjectMapper(new JsonFactory());
@@ -45,7 +45,7 @@ public class FeishuResponseErrorHandler extends DefaultResponseErrorHandler {
             if (!isIgnore) {
                 LOGGER.error("Calling feishu API error,is it possible to ignore errors[{}],HTTP status code:[{}],"
                                 + "business error code:[{}],business error message:[{}],response header: \n{}",
-                        false, response.getRawStatusCode(),
+                        false, statusCode.value(),
                         error.getCode(), error.getMsg(), response.getHeaders());
             }
 

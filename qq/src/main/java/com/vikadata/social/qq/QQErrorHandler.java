@@ -10,7 +10,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.lang.NonNull;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.UnknownHttpStatusCodeException;
@@ -24,6 +26,9 @@ public class QQErrorHandler extends DefaultResponseErrorHandler {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    /**
+     * Constructor.
+     */
     public QQErrorHandler() {
         objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -31,41 +36,37 @@ public class QQErrorHandler extends DefaultResponseErrorHandler {
 
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
-        int rawStatusCode = response.getRawStatusCode();
-        HttpStatus statusCode = HttpStatus.resolve(rawStatusCode);
-        if (statusCode != null) {
-            if (statusCode.is2xxSuccessful()) {
-                // Parse the response body and determine whether the return is successful
-                byte[] body = getResponseBody(response);
-                JsonNode jsonNode = objectMapper.readTree(body);
-                // The results of QQ's oauth2 and getUserInfo are not the same, and must be distinguished for
-                // analysis and judgment
-                if (jsonNode.has("error")) {
-                    // oauth2 interface call failed
-                    logger.error("QQ Authorization error:" + jsonNode.get("error") + ", description: " + jsonNode.get("error_description"));
+        HttpStatusCode statusCode = response.getStatusCode();
+        if (statusCode.is2xxSuccessful()) {
+            // Parse the response body and determine whether the return is successful
+            byte[] body = getResponseBody(response);
+            JsonNode jsonNode = objectMapper.readTree(body);
+            // The results of QQ's oauth2 and getUserInfo are not the same, and must be distinguished for
+            // analysis and judgment
+            if (jsonNode.has("error")) {
+                // oauth2 interface call failed
+                logger.error("QQ Authorization error:" + jsonNode.get("error") + ", description: " + jsonNode.get("error_description"));
+                return true;
+            }
+            else if (jsonNode.has("ret")) {
+                // getUserInfo interface
+                int ret = jsonNode.get("ret").asInt();
+                if (ret != 0) {
+                    logger.error("QQ get user info error, return code: " + jsonNode.get("ret") + ", message: " + jsonNode.get("msg"));
                     return true;
                 }
-                else if (jsonNode.has("ret")) {
-                    // getUserInfo interface
-                    int ret = jsonNode.get("ret").asInt();
-                    if (ret != 0) {
-                        logger.error("QQ get user info error, return code: " + jsonNode.get("ret") + ", message: " + jsonNode.get("msg"));
-                        return true;
-                    }
-                }
-                return false;
             }
-            return super.hasError(statusCode);
+            return false;
         }
-        return super.hasError(rawStatusCode);
+        return super.hasError(statusCode);
     }
 
     @Override
-    public void handleError(ClientHttpResponse response) throws IOException {
+    public void handleError(@NonNull ClientHttpResponse response) throws IOException {
         if (logger.isDebugEnabled()) {
-            logger.debug("Http Response Status: " + response.getRawStatusCode());
+            logger.debug("Http Response Status: " + response.getStatusCode().value());
         }
-        HttpStatus statusCode = HttpStatus.resolve(response.getRawStatusCode());
+        HttpStatus statusCode = HttpStatus.resolve(response.getStatusCode().value());
         if (statusCode != null) {
             if (statusCode.is2xxSuccessful()) {
                 // The error inherited from the custom parsing of the has Error() method above, the HTTP status code is still 200 success
@@ -90,7 +91,7 @@ public class QQErrorHandler extends DefaultResponseErrorHandler {
             byte[] body = getResponseBody(response);
             String message = "Connect Server Error";
             throw new UnknownHttpStatusCodeException(message,
-                    response.getRawStatusCode(), response.getStatusText(),
+                    response.getStatusCode().value(), response.getStatusText(),
                     response.getHeaders(), body, getCharset(response));
         }
     }

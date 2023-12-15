@@ -19,8 +19,15 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
  */
 public class QQTemplate extends ApiBinding implements QQ {
 
+    /**
+     * api request operations.
+     */
     private AuthOperations authOperations;
 
+    /**
+     * Constructor.
+     * @param appConfig appConfig
+     */
     public QQTemplate(AppConfig appConfig) {
         configureRestTemplate();
         this.authOperations = new AuthTemplate(appConfig, getRestTemplate());

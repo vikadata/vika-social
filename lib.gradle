@@ -1,17 +1,18 @@
 ext {
     dependencies = [
-            'spring-web'       : 'org.springframework:spring-web:5.3.31',
-            'spring-data-redis': 'org.springframework.data:spring-data-redis:2.7.18',
-            'lombok'           : 'org.projectlombok:lombok:1.18.30',
-            'jackson'          : 'com.fasterxml.jackson.core:jackson-databind:2.15.3',
-            'okhttp3'          : 'com.squareup.okhttp3:okhttp:4.9.3',
-            'servlet-api'      : 'javax.servlet:javax.servlet-api:4.0.1',
-            'wx-cp'            : "com.github.binarywang:weixin-java-cp:4.2.0",
-            'slf4j'            : [
-                    'org.slf4j:slf4j-api:2.0.9',
-                    'ch.qos.logback:logback-classic:1.4.11',
+            'spring-dependencies': 'org.springframework.boot:spring-boot-dependencies:3.2.0',
+            'spring-web'         : 'org.springframework:spring-web',
+            'spring-data-redis'  : 'org.springframework.data:spring-data-redis',
+            'lombok'             : 'org.projectlombok:lombok',
+            'jackson'            : 'com.fasterxml.jackson.core:jackson-databind',
+            'okhttp3'            : 'com.squareup.okhttp3:okhttp',
+            'servlet-api'        : 'jakarta.servlet:jakarta.servlet-api',
+            'wx-cp'              : "com.github.binarywang:weixin-java-cp:4.2.0",
+            'slf4j'              : [
+                    'org.slf4j:slf4j-api',
+                    'ch.qos.logback:logback-classic',
             ],
-            'hutool'           : [
+            'hutool'             : [
                     "cn.hutool:hutool-core:5.8.23",
                     "cn.hutool:hutool-json:5.8.23",
                     "cn.hutool:hutool-crypto:5.8.23",

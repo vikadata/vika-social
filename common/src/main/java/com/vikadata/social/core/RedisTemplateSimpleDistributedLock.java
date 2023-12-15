@@ -80,19 +80,13 @@ public class RedisTemplateSimpleDistributedLock implements Lock {
         final byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
         final byte[] valueBytes = value.getBytes(StandardCharsets.UTF_8);
         List<Object> redisResults =
-        redisTemplate.executePipelined(
-            (RedisCallback<String>) connection -> {
-                DefaultStringRedisConnection stringRedisConn = (DefaultStringRedisConnection) connection;
-                stringRedisConn.set(
-                    keyBytes,
-                    valueBytes,
-                    Expiration.milliseconds(leaseMilliseconds),
-                    RedisStringCommands.SetOption.SET_IF_ABSENT
-                    );
-                stringRedisConn.get(keyBytes);
+            redisTemplate.executePipelined((RedisCallback<String>) connection -> {
+                connection.stringCommands()
+                    .set(keyBytes, valueBytes, Expiration.milliseconds(leaseMilliseconds),
+                        RedisStringCommands.SetOption.SET_IF_ABSENT);
+                connection.stringCommands().get(keyBytes);
                 return null;
-            }
-        );
+            });
         Object currentLockSecret =
             redisResults.size() > 1 ? redisResults.get(1) : redisResults.get(0);
         return currentLockSecret != null && currentLockSecret.toString().equals(value);

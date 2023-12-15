@@ -1,5 +1,6 @@
 package com.vikadata.social.core;
 
+import org.springframework.data.redis.connection.DefaultStringRedisConnection;
 import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -14,6 +15,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
+import org.springframework.lang.NonNull;
 
 /**
  * Implement simple redis distributed lock, support reentrancy, not Redlock
@@ -28,9 +30,18 @@ public class RedisTemplateSimpleDistributedLock implements Lock {
 
     private final ThreadLocal<String> valueThreadLocal = new ThreadLocal<>();
 
-    public RedisTemplateSimpleDistributedLock(StringRedisTemplate redisTemplate, String key, int leaseMilliseconds) {
+    /**
+     * constructor.
+     *
+     * @param redisTemplate     RedisTemplate
+     * @param key               Lock key
+     * @param leaseMilliseconds The lease time of the lock, in milliseconds
+     */
+    public RedisTemplateSimpleDistributedLock(StringRedisTemplate redisTemplate, String key,
+                                              int leaseMilliseconds) {
         if (leaseMilliseconds <= 0) {
-            throw new IllegalArgumentException("Parameter 'leaseMilliseconds' must grate then 0: " + leaseMilliseconds);
+            throw new IllegalArgumentException(
+                "Parameter 'leaseMilliseconds' must grate then 0: " + leaseMilliseconds);
         }
         this.redisTemplate = redisTemplate;
         this.key = key;
@@ -42,20 +53,18 @@ public class RedisTemplateSimpleDistributedLock implements Lock {
         while (!tryLock()) {
             try {
                 Thread.sleep(1000);
-            }
-            catch (InterruptedException e) {
+            } catch (InterruptedException e) {
                 // Ignore
             }
         }
     }
 
     @Override
-    public void lockInterruptibly() throws InterruptedException {
+    public void lockInterruptibly() {
         while (!tryLock()) {
             try {
                 Thread.sleep(1000);
-            }
-            catch (InterruptedException e) {
+            } catch (InterruptedException e) {
                 // Ignore
             }
         }
@@ -64,18 +73,28 @@ public class RedisTemplateSimpleDistributedLock implements Lock {
     @Override
     public boolean tryLock() {
         String value = valueThreadLocal.get();
-        if (value == null || value.length() == 0) {
+        if (value == null || value.isEmpty()) {
             value = UUID.randomUUID().toString();
             valueThreadLocal.set(value);
         }
         final byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
         final byte[] valueBytes = value.getBytes(StandardCharsets.UTF_8);
-        List<Object> redisResults = redisTemplate.executePipelined((RedisCallback<String>) connection -> {
-            connection.set(keyBytes, valueBytes, Expiration.milliseconds(leaseMilliseconds), RedisStringCommands.SetOption.SET_IF_ABSENT);
-            connection.get(keyBytes);
-            return null;
-        });
-        Object currentLockSecret = redisResults.size() > 1 ? redisResults.get(1) : redisResults.get(0);
+        List<Object> redisResults =
+        redisTemplate.executePipelined(
+            (RedisCallback<String>) connection -> {
+                DefaultStringRedisConnection stringRedisConn = (DefaultStringRedisConnection) connection;
+                stringRedisConn.set(
+                    keyBytes,
+                    valueBytes,
+                    Expiration.milliseconds(leaseMilliseconds),
+                    RedisStringCommands.SetOption.SET_IF_ABSENT
+                    );
+                stringRedisConn.get(keyBytes);
+                return null;
+            }
+        );
+        Object currentLockSecret =
+            redisResults.size() > 1 ? redisResults.get(1) : redisResults.get(0);
         return currentLockSecret != null && currentLockSecret.toString().equals(value);
     }
 
@@ -96,19 +115,23 @@ public class RedisTemplateSimpleDistributedLock implements Lock {
     public void unlock() {
         if (valueThreadLocal.get() != null) {
             // Tip: returnType must be specified, type: here must be Long, not Integer
-            RedisScript<Long> script = new DefaultRedisScript<>("if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end", Long.class);
+            RedisScript<Long> script = new DefaultRedisScript<>(
+                "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end",
+                Long.class);
             redisTemplate.execute(script, Collections.singletonList(key), valueThreadLocal.get());
             valueThreadLocal.remove();
         }
     }
 
     @Override
+    @NonNull
     public Condition newCondition() {
         throw new UnsupportedOperationException();
     }
 
     /**
      * Get the value of the current lock
+     *
      * @return Returning null means that there is no lock, but returning a non-null value does not
      * mean that the current lock is successful (the key in redis may automatically expire)
      */
@@ -116,14 +139,29 @@ public class RedisTemplateSimpleDistributedLock implements Lock {
         return valueThreadLocal.get();
     }
 
+    /**
+     * Get the redis template of the current lock
+     *
+     * @return redis template
+     */
     public StringRedisTemplate getRedisTemplate() {
         return redisTemplate;
     }
 
+    /**
+     * Get the key of the current lock
+     *
+     * @return key
+     */
     public String getKey() {
         return key;
     }
 
+    /**
+     * Get the lease time of the current lock
+     *
+     * @return lease time
+     */
     public int getLeaseMilliseconds() {
         return leaseMilliseconds;
     }

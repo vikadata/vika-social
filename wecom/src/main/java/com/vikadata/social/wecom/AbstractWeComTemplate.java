@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 import com.vikadata.social.wecom.config.WeComRedisConfigImpl;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -234,7 +234,7 @@ public abstract class AbstractWeComTemplate {
      */
     private RestTemplate createRestTemplate() {
         RestTemplate client = new RestTemplate();
-        client.setRequestFactory(new OkHttp3ClientHttpRequestFactory());
+        client.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
         return client;
     }
 

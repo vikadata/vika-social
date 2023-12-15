@@ -11,10 +11,22 @@ import org.springframework.web.client.RestTemplate;
  */
 public abstract class AbstractQQOperations extends AbstractOperations {
 
+    /**
+     * constructor
+     * @param restTemplate RestTemplate
+     */
     public AbstractQQOperations(RestTemplate restTemplate) {
         super(restTemplate);
     }
 
+    /**
+     * do get request.
+     * @param url request url
+     * @param responseClass response class
+     * @return response body
+     * @param <T> class type
+     * @throws QQException throw QQException if request failed
+     */
     protected <T> T doGet(String url, Class<T> responseClass) throws QQException {
         try {
             ResponseEntity<T> response = this.restTemplate.getForEntity(url, responseClass);

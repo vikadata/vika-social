@@ -2,21 +2,26 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'signing'
+    id 'io.freefair.lombok'
 }
 
 dependencies {
-  api(project(':common'))
+    api(project(':common'))
 
-  implementation rootProject.ext.dependencies['jackson']
-  implementation rootProject.ext.dependencies['slf4j']
+    implementation(platform(rootProject.ext.dependencies['spring-dependencies']))
+    implementation rootProject.ext.dependencies['jackson']
+    implementation rootProject.ext.dependencies['slf4j']
 }
 
 group = 'cn.vika'
-version = '1.0.6'
 
 java {
     withJavadocJar()
     withSourcesJar()
+}
+
+tasks.withType(Javadoc).configureEach {
+    exclude("**/*.java")
 }
 
 publishing {

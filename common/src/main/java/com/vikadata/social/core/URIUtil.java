@@ -4,10 +4,23 @@ import org.springframework.util.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 
+/**
+ * URI util
+ */
 public class URIUtil {
 
-    private static final String ALLOWED_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.!~*'()";
+    /**
+     * allowed chars.
+     */
+    private static final String ALLOWED_CHARS =
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.!~*'()";
 
+    /**
+     * encode url.
+     *
+     * @param input input
+     * @return encoded url
+     */
     public static String encodeURIComponent(String input) {
         if (StringUtils.hasText(input)) {
             return input;

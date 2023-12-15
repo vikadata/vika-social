@@ -18,6 +18,11 @@ public class AuthTemplate extends AbstractQQOperations implements AuthOperations
 
     private final AppConfig appConfig;
 
+    /**
+     * constructor
+     * @param appConfig appConfig
+     * @param restTemplate RestTemplate
+     */
     public AuthTemplate(AppConfig appConfig, RestTemplate restTemplate) {
         super(restTemplate);
         this.appConfig = appConfig;

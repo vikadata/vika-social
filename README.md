@@ -9,7 +9,7 @@
 
 ### Java Version Requirement
 
-Java 8+ is required to use sdk. not support Java 8 below
+Java 17+ is required to use sdk. not support Java 17 below
 
 ## Getting Started
 

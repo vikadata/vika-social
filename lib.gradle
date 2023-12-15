@@ -15,7 +15,6 @@ ext {
             'hutool'             : [
                     "cn.hutool:hutool-core:5.8.23",
                     "cn.hutool:hutool-json:5.8.23",
-                    "cn.hutool:hutool-crypto:5.8.23",
                     "cn.hutool:hutool-cache:5.8.23",
                     "cn.hutool:hutool-http:5.8.23",
             ],
